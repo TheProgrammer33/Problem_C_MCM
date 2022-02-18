@@ -5,17 +5,10 @@ bitCoinExchange = pd.read_csv("./Data/BCHAIN-MKPRU.csv")
 goldExchange = pd.read_csv("./Data/LBMA-GOLD.csv")
 
 def findMissingDates():
-    missingDates = {}
+    missingDates = []
     previousDate = goldExchange["Date"][0]
     for date in goldExchange["Date"][1:]:
-        missingDatesList = findDateGap(previousDate, date)
-        if (missingDatesList):
-            for missingDate in missingDatesList:
-                try:
-                    missingDates[missingDate] += 1
-                except:
-                    missingDates[missingDate] = 1
-
+        missingDates += findDateGap(previousDate, date)
         previousDate = date
     return missingDates
 
@@ -88,39 +81,61 @@ def getDaysBetweenDates(startDate, endDate):
 
     days = 0
 
-    days += getDaysBetweenMonths(startMonth, endMonth, startYear, endYear)
-    days += getDaysBetweenDays(startDay, endDay, endMonth)
-    if (endMonth >= startMonth and endDay >= startDay):
-        days += (endYear-startYear)*365
+    if (startMonth != endMonth or (startDay > endDay and endYear > startYear)):
+        days += getDaysBetweenMonths(startMonth, endMonth, startDay, endDay)
+    else:
+        days += getDaysBetweenDays(startDay, endDay)
+    
+    days += getDaysBetweenYears(startYear, endYear, startMonth, endMonth, startDay, endDay)
 
     return days
 
-    
-
-def getDaysBetweenMonths(startMonth, endMonth, startYear, endYear):
+def getDaysBetweenMonths(startMonth, endMonth, startDay, endDay):
     days = 0
-    leapdays = 0
 
-    if endMonth - startMonth < 0:
-        for i in range(endMonth, 13):
-            days += getDaysFromMonth(i)
-        
-        for i in range(1, startMonth+1):
-            days += getDaysFromMonth(i)
+    if endMonth - startMonth <= 0:
+        for month in range(startMonth, 13):
+            if (month == startMonth):
+                days += getDaysInMonth(month) - startDay
+            else:
+                days += getDaysInMonth(month)
 
+        for i in range(1, endMonth):
+            days += getDaysInMonth(i)
     elif endMonth - startMonth > 0:
-        for i in range(1, endMonth - startMonth + 1):
-            days += getDaysFromMonth(i+startMonth)
+        for month in range(startMonth, endMonth):
+            if (month == startMonth):
+                days += getDaysInMonth(month) - startDay
+            else:
+                days += getDaysInMonth(month)
+    
+    days += endDay
     
     return days
 
-def getDaysBetweenDays(startDay, endDay, endMonth):
+def getDaysBetweenDays(startDay, endDay):
     if endDay - startDay > 0:
         return endDay - startDay
-    else:
-        return getDaysFromMonth(endMonth) - endDay
+    return 0 
 
-def getDaysFromMonth(month):
+def getDaysBetweenYears(startYear, endYear, startMonth, endMonth, startDay, endDay):
+    days = 0
+    numYearsApart = endYear - startYear
+    if (numYearsApart > 0):
+        numMonthsApart = endMonth - startMonth
+        if (numMonthsApart >= 0):
+            if (endDay - startDay >= 0):
+                days += (endYear-startYear)*365
+            elif (numMonthsApart > 0 and not numYearsApart < 1):
+                days += (endYear-startYear)*365
+            elif (numYearsApart > 1):
+                days += (endYear-startYear-1)*365
+        elif (numYearsApart > 1):
+            days += (endYear-startYear-1)*365
+
+    return days
+
+def getDaysInMonth(month):
     months = [2, 4, 6, 9, 11]
     monthsDayCounts = [28, 30, 30, 30, 30]
 
