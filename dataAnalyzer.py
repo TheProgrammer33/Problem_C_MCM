@@ -1,3 +1,5 @@
+from calendar import leapdays
+from tracemalloc import start
 import pandas as pd
 bitCoinExchange = pd.read_csv("./Data/BCHAIN-MKPRU.csv")
 goldExchange = pd.read_csv("./Data/LBMA-GOLD.csv")
@@ -86,13 +88,16 @@ def getDaysBetweenDates(startDate, endDate):
 
     days = 0
 
-    days += getDaysBetweenMonths(startMonth, endMonth)
+    days += getDaysBetweenMonths(startMonth, endMonth, startYear, endYear)
     days += getDaysBetweenDays(startDay, endDay, endMonth)
 
     return days
 
-def getDaysBetweenMonths(startMonth, endMonth):
+    
+
+def getDaysBetweenMonths(startMonth, endMonth, startYear, endYear):
     days = 0
+    leapdays = 0
 
     if endMonth - startMonth < 0:
         for i in range(0, 12 - endMonth):
@@ -100,6 +105,8 @@ def getDaysBetweenMonths(startMonth, endMonth):
         
         for i in range(0, startMonth):
             days += getDaysFromMonth(i)
+
+        days += (endYear-startYear)*365
 
     elif endMonth - startMonth > 0:
         for i in range(0, endMonth - startMonth):
