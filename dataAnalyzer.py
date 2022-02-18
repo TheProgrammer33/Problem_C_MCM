@@ -90,6 +90,8 @@ def getDaysBetweenDates(startDate, endDate):
 
     days += getDaysBetweenMonths(startMonth, endMonth, startYear, endYear)
     days += getDaysBetweenDays(startDay, endDay, endMonth)
+    if (endMonth >= startMonth and endDay >= startDay):
+        days += (endYear-startYear)*365
 
     return days
 
@@ -100,16 +102,14 @@ def getDaysBetweenMonths(startMonth, endMonth, startYear, endYear):
     leapdays = 0
 
     if endMonth - startMonth < 0:
-        for i in range(0, 12 - endMonth):
-            days += getDaysFromMonth(i+endMonth)
+        for i in range(endMonth, 13):
+            days += getDaysFromMonth(i)
         
-        for i in range(0, startMonth):
+        for i in range(1, startMonth+1):
             days += getDaysFromMonth(i)
 
-        days += (endYear-startYear)*365
-
     elif endMonth - startMonth > 0:
-        for i in range(0, endMonth - startMonth):
+        for i in range(1, endMonth - startMonth + 1):
             days += getDaysFromMonth(i+startMonth)
     
     return days
