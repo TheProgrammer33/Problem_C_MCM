@@ -4,7 +4,7 @@ import classificationModels
 def main():
     print("Starting...")
 
-    classificationModels.fillGold()
+    classificationModels.combineCSVs()
     #missingDatesDict = dataAnalyzer.findMissingDates()
     #print(missingDatesDict)
 
