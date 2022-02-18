@@ -51,9 +51,13 @@ def getDatesDifferentMonths(previousDate, currentDate):
 
     months = [2, 4, 6, 9, 11]
     monthsDayCounts = [28, 30, 30, 30, 30]
+    leapDays = 0
+
+    if (int(getYear(previousDate)) % 4 == 0 and (int(getMonth(previousDate))) == 2):
+        leapDays = 1
 
     if (months.count(int(getMonth(previousDate))) > 0):
-        for i in range(int(getDay(previousDate))+1, monthsDayCounts[months.index(int(getMonth(previousDate)))] + 1):
+        for i in range(int(getDay(previousDate))+1, monthsDayCounts[months.index(int(getMonth(previousDate)))] + 1 + leapDays):
             missingDates.append(getMonth(previousDate) + "/" + str(i) + "/" + getYear(previousDate))
     else:
         for i in range(int(getDay(previousDate))+1, 32):
@@ -63,3 +67,60 @@ def getDatesDifferentMonths(previousDate, currentDate):
         missingDates.append(getMonth(currentDate) + "/" + str(i) + "/" + getYear(currentDate))
 
     return missingDates
+
+def getDaysFromMonth(month):
+    months = [2, 4, 6, 9, 11]
+    monthsDayCounts = [28, 30, 30, 30, 30]
+
+    if months.count(month) > 0:
+        return monthsDayCounts[months.index(month)]
+    else:
+        return 31
+
+def getDaysBetweenDays(startDay, endDay, endMonth):
+    if endDay - startDay > 0:
+        return endDay - startDay
+    else:
+        return getDaysFromMonth(endMonth) - endDay
+
+def getDaysBetweenDates(startDate, endDate):
+    startDay = int(getDay(startDate))
+    startMonth = (int(getMonth(startDate)))
+    startYear = int(getYear(startDate))
+
+    endDay = int(getDay(endDate))
+    endMonth = (int(getMonth(endDate)))
+    endYear = int(getYear(endDate))
+
+    days = 0
+
+    days += getDaysBetweenMonths(startMonth, endMonth)
+    days += getDaysBetweenDays(startDay, endDay, endMonth)
+
+    return days
+
+    
+
+def getDaysBetweenMonths(startMonth, endMonth):
+    days = 0
+
+    if endMonth - startMonth < 0:
+        for i in range(0, 12 - endMonth):
+            days += getDaysFromMonth(i+endMonth)
+        
+        for i in range(0, startMonth):
+            days += getDaysFromMonth(i)
+
+    elif endMonth - startMonth > 0:
+        for i in range(0, endMonth - startMonth):
+            days += getDaysFromMonth(i+startMonth)
+    
+    return days
+
+def getDFPosition(date):
+    startDate = '9/11/16'
+
+    position = getDaysBetweenDates(startDate, date)
+
+    return position
+

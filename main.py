@@ -1,9 +1,11 @@
 import dataAnalyzer
+import classificationModels
 
 def main():
     print("Starting...")
 
-    missingDatesDict = dataAnalyzer.findMissingDates()
-    print(missingDatesDict)
+    classificationModels.fillGold()
+    #missingDatesDict = dataAnalyzer.findMissingDates()
+    #print(missingDatesDict)
 
 main()
