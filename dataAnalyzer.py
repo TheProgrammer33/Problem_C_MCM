@@ -68,20 +68,12 @@ def getDatesDifferentMonths(previousDate, currentDate):
 
     return missingDates
 
-def getDaysFromMonth(month):
-    months = [2, 4, 6, 9, 11]
-    monthsDayCounts = [28, 30, 30, 30, 30]
+def getDFPosition(date):
+    startDate = '9/11/16'
 
-    if months.count(month) > 0:
-        return monthsDayCounts[months.index(month)]
-    else:
-        return 31
+    position = getDaysBetweenDates(startDate, date)
 
-def getDaysBetweenDays(startDay, endDay, endMonth):
-    if endDay - startDay > 0:
-        return endDay - startDay
-    else:
-        return getDaysFromMonth(endMonth) - endDay
+    return position
 
 def getDaysBetweenDates(startDate, endDate):
     startDay = int(getDay(startDate))
@@ -99,8 +91,6 @@ def getDaysBetweenDates(startDate, endDate):
 
     return days
 
-    
-
 def getDaysBetweenMonths(startMonth, endMonth):
     days = 0
 
@@ -117,10 +107,17 @@ def getDaysBetweenMonths(startMonth, endMonth):
     
     return days
 
-def getDFPosition(date):
-    startDate = '9/11/16'
+def getDaysBetweenDays(startDay, endDay, endMonth):
+    if endDay - startDay > 0:
+        return endDay - startDay
+    else:
+        return getDaysFromMonth(endMonth) - endDay
 
-    position = getDaysBetweenDates(startDate, date)
+def getDaysFromMonth(month):
+    months = [2, 4, 6, 9, 11]
+    monthsDayCounts = [28, 30, 30, 30, 30]
 
-    return position
-
+    if months.count(month) > 0:
+        return monthsDayCounts[months.index(month)]
+    else:
+        return 31
