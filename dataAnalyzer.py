@@ -1,6 +1,6 @@
 import pandas as pd
-bitCoinExchange = pd.read_csv("Data\BCHAIN-MKPRU.csv")
-goldExchange = pd.read_csv("Data\LBMA-GOLD.csv")
+bitCoinExchange = pd.read_csv("./Data/BCHAIN-MKPRU.csv")
+goldExchange = pd.read_csv("./Data/LBMA-GOLD.csv")
 
 def findMissingDates():
     missingDates = {}
@@ -27,7 +27,7 @@ def findDateGap(previousDate, currentDate):
     elif (gap > 1):
         missingDates = []
         for i in range(previousDay+1, currentDay):
-            missingDates.append(getMonth(previousDate) + "/" + str(i))
+            missingDates.append(getMonth(previousDate) + "/" + str(i) + "/" + getYear(previousDate))
 
     return missingDates
 
@@ -48,8 +48,18 @@ def getYear(date):
 
 def getDatesDifferentMonths(previousDate, currentDate):
     missingDates = []
-    for i in range(int(getDay(previousDate))+1, 32):
-        missingDates.append(getMonth(previousDate) + "/" + str(i))
+
+    months = [2, 4, 6, 9, 11]
+    monthsDayCounts = [28, 30, 30, 30, 30]
+
+    if (months.count(int(getMonth(previousDate))) > 0):
+        for i in range(int(getDay(previousDate))+1, monthsDayCounts[months.index(int(getMonth(previousDate)))] + 1):
+            missingDates.append(getMonth(previousDate) + "/" + str(i) + "/" + getYear(previousDate))
+    else:
+        for i in range(int(getDay(previousDate))+1, 32):
+            missingDates.append(getMonth(previousDate) + "/" + str(i) + "/" + getYear(previousDate))
+
     for i in range(1, int(getDay(currentDate))):
-        missingDates.append(getMonth(currentDate) + "/" + str(i))
+        missingDates.append(getMonth(currentDate) + "/" + str(i) + "/" + getYear(currentDate))
+
     return missingDates
