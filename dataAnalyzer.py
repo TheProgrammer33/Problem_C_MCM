@@ -48,7 +48,8 @@ def getYear(date):
 
 def getDatesDifferentMonths(previousDate, currentDate):
     missingDates = []
-    for i in range(int(getDay(previousDate)), 32):
+    for i in range(int(getDay(previousDate))+1, 32):
         missingDates.append(getMonth(previousDate) + "/" + str(i))
     for i in range(1, int(getDay(currentDate))):
         missingDates.append(getMonth(currentDate) + "/" + str(i))
+    return missingDates
