@@ -4,6 +4,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 # Model Training / Testing
 from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPRegressor
 from sklearn.neighbors import KNeighborsRegressor
 
 # Model Regession
@@ -51,6 +52,21 @@ def RandomForest(numDataPoints):
     # print('Mean Absolute Error:', metrics.mean_absolute_error(test[target], targetPrediction))  
     # print('Mean Squared Error:', metrics.mean_squared_error(test[target], targetPrediction))  
     # print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(test[target], targetPrediction)))
+
+    return targetPrediction
+
+def MLPNN(numDataPoints):
+    train, test, data, target = setupData(numDataPoints, True)
+
+    multiLayerPerceptronRegressor_model = MLPRegressor(hidden_layer_sizes=(64,64,64),activation="relu" ,random_state=1, max_iter=2000)
+
+    multiLayerPerceptronRegressor_model.fit(train[data], train[target])
+
+    targetPrediction = multiLayerPerceptronRegressor_model.predict(test[data])
+
+    # print('Mean Absolute Error:', metrics.mean_absolute_error(targetTest, targetPrediction))  
+    # print('Mean Squared Error:', metrics.mean_squared_error(targetTest, targetPrediction))  
+    # print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(targetTest, targetPrediction))) 
 
     return targetPrediction
 
