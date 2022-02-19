@@ -1,5 +1,6 @@
 # General imports
 import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
 
 # Model Training / Testing
 from sklearn.model_selection import train_test_split
@@ -30,6 +31,21 @@ def DecisionTree(numDataPoints):
     decisionTreeRegressor_model.fit(train[data], train[target])
 
     targetPrediction = decisionTreeRegressor_model.predict(test[data])
+
+    # print('Mean Absolute Error:', metrics.mean_absolute_error(test[target], targetPrediction))  
+    # print('Mean Squared Error:', metrics.mean_squared_error(test[target], targetPrediction))  
+    # print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(test[target], targetPrediction)))
+
+    return targetPrediction
+
+def RandomForest(numDataPoints):
+    train, test, data, target = setupData(numDataPoints, True)
+
+    randomForestRegressor_model = RandomForestRegressor()
+
+    randomForestRegressor_model.fit(train[data], train[target])
+
+    targetPrediction = randomForestRegressor_model.predict(test[data])
 
     # print('Mean Absolute Error:', metrics.mean_absolute_error(test[target], targetPrediction))  
     # print('Mean Squared Error:', metrics.mean_squared_error(test[target], targetPrediction))  

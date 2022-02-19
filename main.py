@@ -12,12 +12,14 @@ def main():
     dataCleaner.combineCSVs()
     priceEffect.setPriceEffectToFile()
 
+    outputPredictions = []
     t0 = time.time()
     btcGoldDF = pd.read_csv('./Data/finalData.csv')
     results = {"Training Days": [], "Prediction": [], "Actual": [], "Accurate": []}
 
     for trainingDays in range(10, len(btcGoldDF)-11):
         lastTrainingDayPrice = btcGoldDF["Gold Price"][trainingDays]
+        outputPredictions.append([predicted, actual])
         predictionForNextDay = getRiseFall(lastTrainingDayPrice, regressionModels.DecisionTree(trainingDays)[0])
         actualNextDay = getRiseFall(lastTrainingDayPrice, btcGoldDF["Gold Price"][trainingDays+1])
 
@@ -29,8 +31,22 @@ def main():
     resultDF = pd.DataFrame(results)
     resultDF.to_csv('./Data/trainingResults.csv', index=False, columns=["Training Days", "Prediction", "Actual", "Accurate"])
     
+        predicted = getRiseFall(lastTrainingDayPrice, predictionForNextDay)
+        actual = getRiseFall(lastTrainingDayPrice, actualPrice)
     t1 = time.time()
     print("Time Required: " + str(t1-t0))
+
+    summedPredictions = 0
+
+    for output in outputPredictions:
+        if output[0] == output[1]:
+            summedPredictions += 100
+        else:
+            summedPredictions += 0
+    
+    accuracy = summedPredictions / len(outputPredictions)
+
+    print("Final accuracy: " + str(accuracy) + "%")
 
     #dataCleaner.fillGold()
 
