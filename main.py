@@ -1,10 +1,12 @@
 import dataAnalyzer
 import classificationModels
+import priceEffect
 
 def main():
     print("Starting...")
 
-    classificationModels.combineCSVs()
+    priceEffect.setPriceEffectToFile()
+    # classificationModels.combineCSVs()
     #missingDatesDict = dataAnalyzer.findMissingDates()
     #print(missingDatesDict)
 
