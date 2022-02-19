@@ -23,10 +23,8 @@ def combineCSVs():
     btcDF = pd.read_csv('./Data/BCHAIN-MKPRU.csv')
 
     df = goldDF.join(btcDF['BTC Price'])
-    #df = goldDF.insert(column='BTC Value', value=btcDF['Value'])
 
     df.to_csv('./Data/finalData.csv', index=False)
-    
 
 def insert_row(idx, df, df_insert):
     dfA = df.iloc[:idx]
@@ -57,21 +55,30 @@ def fillGold():
         #goldDF.loc[positionInDF] = [date, goldDF[positionInDF-1]]
 
     goldDF.to_csv('./Data/newGold.csv', index=False)
-    
 
-def classifierCaller(classifierFunction):
-    prediction = classifierFunction()
+def setupData(numDataPoints):
+    btcGoldDF = pd.read_csv('./Data/finalData.csv')
 
-    print('Accuracy Score: ', round(accuracy_score(test[target], prediction)*100, 2),'%')
+    configuredDataSizeDF = btcGoldDF.iloc[:numDataPoints,:]
 
-def setupData():
-    btcGoldDF = pd.read_csv('./Data/')
-
-    data = btcGoldDF[0:1]
-    target = btcGoldDF[2]
+    data = configuredDataSizeDF[0:1]
+    target = configuredDataSizeDF[2]
 
     #dataTrain, dataTest, targetTrain, targetTest = train_test_split(data_mod, test_size=0.25)
-    return train_test_split(btcGoldDF, test_size=0.15)
+    return train_test_split(btcGoldDF, test_size=0.15), data, target
+
+def classifierCaller(classifierFunction, numDataPoints):
+    outputList = []
+
+    train, test, data, target = setupData(numDataPoints)
+    
+    prediction = classifierFunction(train, test, data, target)
+
+    model_acc = round(accuracy_score(test[target], prediction)*100, 2)
+
+    outputList.insert(numDataPoints, str(classifierFunction), model_acc)
+
+    return outputList
 
 def naiveBayes(train, test, data, target):
     naiveBayes_model = GaussianNB()
