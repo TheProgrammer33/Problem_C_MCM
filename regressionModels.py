@@ -4,6 +4,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 # Model Training / Testing
 from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsRegressor
 
 # Model Regession
 from sklearn.tree import DecisionTreeRegressor
@@ -50,6 +51,17 @@ def RandomForest(numDataPoints):
     # print('Mean Absolute Error:', metrics.mean_absolute_error(test[target], targetPrediction))  
     # print('Mean Squared Error:', metrics.mean_squared_error(test[target], targetPrediction))  
     # print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(test[target], targetPrediction)))
+
+    return targetPrediction
+
+def kNeighbors(numDataPoints):
+    train, test, data, target = setupData(numDataPoints, True)
+
+    kNeighborsRegressor_model = KNeighborsRegressor()
+
+    kNeighborsRegressor_model.fit(train[data], train[target])
+
+    targetPrediction = kNeighborsRegressor_model.predict(test[data])
 
     return targetPrediction
 

@@ -19,7 +19,7 @@ def main():
 
     for trainingDays in range(10, len(btcGoldDF)-11):
         lastTrainingDayPrice = btcGoldDF["Gold Price"][trainingDays]
-        predictionForNextDay = getRiseFall(lastTrainingDayPrice, regressionModels.DecisionTree(trainingDays)[0])
+        predictionForNextDay = getRiseFall(lastTrainingDayPrice, regressionModels.kNeighbors(trainingDays)[0])
         actualNextDay = getRiseFall(lastTrainingDayPrice, btcGoldDF["Gold Price"][trainingDays+1])
 
         results["Training Days"].append(lastTrainingDayPrice)
