@@ -19,7 +19,6 @@ def main():
 
     for trainingDays in range(10, len(btcGoldDF)-11):
         lastTrainingDayPrice = btcGoldDF["Gold Price"][trainingDays]
-        outputPredictions.append([predicted, actual])
         predictionForNextDay = getRiseFall(lastTrainingDayPrice, regressionModels.DecisionTree(trainingDays)[0])
         actualNextDay = getRiseFall(lastTrainingDayPrice, btcGoldDF["Gold Price"][trainingDays+1])
 
@@ -28,11 +27,11 @@ def main():
         results["Actual"].append(actualNextDay)
         results["Accurate"].append(1 if predictionForNextDay == actualNextDay else 0)
 
+        outputPredictions.append([predictionForNextDay, actualNextDay])
+
     resultDF = pd.DataFrame(results)
     resultDF.to_csv('./Data/trainingResults.csv', index=False, columns=["Training Days", "Prediction", "Actual", "Accurate"])
-    
-        predicted = getRiseFall(lastTrainingDayPrice, predictionForNextDay)
-        actual = getRiseFall(lastTrainingDayPrice, actualPrice)
+
     t1 = time.time()
     print("Time Required: " + str(t1-t0))
 
