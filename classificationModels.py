@@ -35,8 +35,7 @@ def insert_row(idx, df, df_insert):
     return df
 
 def fillGold():
-    goldDF = pd.read_csv('./Data/LBMA-GOLD.csv')
-    btcDF = pd.read_csv('./Data/BCHAIN-MKPRU.csv')
+    goldDF = pd.read_csv('./Data/fixedGold.csv')
 
     # previousDay = goldDF['Date'][0]
     # currentDay = goldDF['Date'][1]
@@ -56,34 +55,51 @@ def fillGold():
 
     goldDF.to_csv('./Data/newGold.csv', index=False)
 
+def fixGold():
+    goldDF = pd.read_csv('./Data/LBMA-GOLD.csv')
+
+    # previousDay = goldDF['Date'][0]
+    # currentDay = goldDF['Date'][1]
+    # for i in range(0, btcDF.size()):
+    #     if int(dataAnalyzer.getDay(currentDay)) - int(dataAnalyzer.getDay(previousDay)) > 0:
+
+    positions, dates = dataAnalyzer.getMissingPriceDates(goldDF)
+
+    for i in range(len(positions)):
+        #goldDF['USD (PM)'][position] = goldDF['USD (PM)'][position-1]
+        goldDF.loc[positions[i]] = dates[i], goldDF['USD (PM)'][positions[i]-1]
+        #goldDF.loc[positionInDF] = [date, goldDF[positionInDF-1]]
+
+    goldDF.to_csv('./Data/fixedGold.csv', index=False)
+
 def setupData(numDataPoints):
     btcGoldDF = pd.read_csv('./Data/finalData.csv')
 
     configuredDataSizeDF = btcGoldDF.iloc[:numDataPoints,:]
 
-    data = configuredDataSizeDF[0:1]
-    target = configuredDataSizeDF[2]
+    data = ['USD (PM)', 'BTC Price']
+    target = 'GoldDelta'
 
     #dataTrain, dataTest, targetTrain, targetTest = train_test_split(data_mod, test_size=0.25)
-    return train_test_split(btcGoldDF, test_size=0.15), data, target
+
+    train, test = train_test_split(configuredDataSizeDF, test_size=0.15)
+
+    return train, test, data, target
 
 def classifierCaller(classifierFunction, numDataPoints):
-    outputList = []
-
     train, test, data, target = setupData(numDataPoints)
     
     prediction = classifierFunction(train, test, data, target)
 
     model_acc = round(accuracy_score(test[target], prediction)*100, 2)
 
-    outputList.insert(numDataPoints, str(classifierFunction), model_acc)
-
-    return outputList
+    return numDataPoints, str(classifierFunction), model_acc
 
 def naiveBayes(train, test, data, target):
     naiveBayes_model = GaussianNB()
 
     naiveBayes_model.fit(train[data], train[target])
+    
     return naiveBayes_model.predict(test[data])
 
 def logisticRegression(train, test, data, target):

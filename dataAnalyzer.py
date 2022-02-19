@@ -1,6 +1,8 @@
 from calendar import leapdays
 from tracemalloc import start
+from numpy import NaN
 import pandas as pd
+import math
 bitCoinExchange = pd.read_csv("./Data/BCHAIN-MKPRU.csv")
 goldExchange = pd.read_csv("./Data/LBMA-GOLD.csv")
 
@@ -144,9 +146,13 @@ def getDaysInMonth(month):
     else:
         return 31
 
-def getMissingPriceDates():
+def getMissingPriceDates(df):
+    missingPriceDatesPosition = []
     missingPriceDates = []
-    for priceIndex in range(len(goldExchange["USD (PM)"])):
-        if (goldExchange["USD (PM)"][priceIndex]):
-            missingPriceDates.append(goldExchange["Date"][priceIndex])
-    return missingPriceDates
+
+    for priceIndex in range(len(df["USD (PM)"])):
+        if (math.isnan(df["USD (PM)"][priceIndex])):
+            missingPriceDatesPosition.append(priceIndex)
+            missingPriceDates.append(df['Date'][priceIndex])
+    
+    return missingPriceDatesPosition, missingPriceDates
