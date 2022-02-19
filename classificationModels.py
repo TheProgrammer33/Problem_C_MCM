@@ -73,7 +73,7 @@ def fixGold():
 
     goldDF.to_csv('./Data/fixedGold.csv', index=False)
 
-def setupData(numDataPoints):
+def setupData(numDataPoints, predictFuture):
     btcGoldDF = pd.read_csv('./Data/finalData.csv')
 
     configuredDataSizeDF = btcGoldDF.iloc[:numDataPoints]
@@ -81,23 +81,15 @@ def setupData(numDataPoints):
     data = ['Index']
     target = 'Gold Price'
 
-    #dataTrain, dataTest, targetTrain, targetTest = train_test_split(data_mod, test_size=0.25)
-
-    train, test = train_test_split(configuredDataSizeDF, test_size=0.15)
-
-    # standardScaler = StandardScaler()
-    # dataTrainScaled = standardScaler.fit_transform(train[data])
-    # dataTestScaled = standardScaler.transform(test[data])
-
-    # labelEncoder = LabelEncoder()
-
-    # trainTargetEncoded = labelEncoder.fit(train[target])
-    # testTargetEncoded = labelEncoder.fit(test[target])
+    if (predictFuture):
+        train, test = getFutureData(btcGoldDF, numDataPoints)
+    else:
+        train, test = train_test_split(configuredDataSizeDF, test_size=0.15)
 
     return train, test, data, target#, trainTargetEncoded, testTargetEncoded
 
 def regressionAttempt(numDataPoints):
-    train, test, data, target = setupData(numDataPoints)
+    train, test, data, target = setupData(numDataPoints, True)
 
     decisionTreeRegressor_model = DecisionTreeRegressor()
 
@@ -105,9 +97,11 @@ def regressionAttempt(numDataPoints):
 
     targetPrediction = decisionTreeRegressor_model.predict(test[data])
 
-    print('Mean Absolute Error:', metrics.mean_absolute_error(test[target], targetPrediction))  
-    print('Mean Squared Error:', metrics.mean_squared_error(test[target], targetPrediction))  
-    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(test[target], targetPrediction))) 
+    # print('Mean Absolute Error:', metrics.mean_absolute_error(test[target], targetPrediction))  
+    # print('Mean Squared Error:', metrics.mean_squared_error(test[target], targetPrediction))  
+    # print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(test[target], targetPrediction)))
+
+    return targetPrediction
 
 def classifierCaller(classifierFunction, numDataPoints):
     train, test, data, target = setupData(numDataPoints)
@@ -159,3 +153,9 @@ def randomForest(train, test, data, target):
     randomForestClassifier_model.fit(train[data], train[target])
 
     return randomForestClassifier_model.predict(test[data])
+
+def getFutureData(df, numDataPoints):
+    train = df.iloc[:numDataPoints]
+    test = df.iloc[[numDataPoints+1]]
+
+    return train, test

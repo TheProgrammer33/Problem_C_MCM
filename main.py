@@ -28,7 +28,13 @@ def main():
 
     t0 = time.time()
     #automateClassifierTester()
-    classificationModels.regressionAttempt(100)
+    btcGoldDF = pd.read_csv('./Data/finalData.csv')
+    for trainingDays in range(10, 200):
+        lastTrainingDayPrice = btcGoldDF["Gold Price"][trainingDays]
+        predictionForNextDay = classificationModels.regressionAttempt(trainingDays)[0]
+        actualPrice = btcGoldDF["Gold Price"][trainingDays+1]
+        print("Prediction: " + getRiseFall(lastTrainingDayPrice, predictionForNextDay))
+        print("Actual: " + getRiseFall(lastTrainingDayPrice, actualPrice))
     t1 = time.time()
     print("Time Required: " + str(t1-t0))
 
@@ -36,5 +42,14 @@ def main():
 
     #missingDatesDict = dataAnalyzer.findMissingDates()
     #print(missingDatesDict)
+
+def getRiseFall(previousPrice, currentPrice):
+    if previousPrice > currentPrice:
+        return "Fell"
+    elif previousPrice < currentPrice:
+        return "Rose"
+    else:
+        return "Stayed" 
+
 
 main()
