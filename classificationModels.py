@@ -4,6 +4,7 @@ import numpy as np
 import dataAnalyzer
 
 # Data cleaning
+from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 
 # Model Training / Testing
@@ -24,7 +25,7 @@ def combineCSVs():
 
     df = goldDF.join(btcDF['BTC Price'])
 
-    df.to_csv('./Data/finalData.csv', index=False)
+    df.to_csv('./Data/finalData.csv', index=True)
 
 def insert_row(idx, df, df_insert):
     dfA = df.iloc[:idx]
@@ -75,16 +76,25 @@ def fixGold():
 def setupData(numDataPoints):
     btcGoldDF = pd.read_csv('./Data/finalData.csv')
 
-    configuredDataSizeDF = btcGoldDF.iloc[:numDataPoints,:]
+    configuredDataSizeDF = btcGoldDF.iloc[:numDataPoints]
 
-    data = ['USD (PM)', 'BTC Price']
-    target = 'GoldDelta'
+    data = ['Index']
+    target = 'Gold Price'
 
     #dataTrain, dataTest, targetTrain, targetTest = train_test_split(data_mod, test_size=0.25)
 
     train, test = train_test_split(configuredDataSizeDF, test_size=0.15)
 
-    return train, test, data, target
+    # standardScaler = StandardScaler()
+    # dataTrainScaled = standardScaler.fit_transform(train[data])
+    # dataTestScaled = standardScaler.transform(test[data])
+
+    # labelEncoder = LabelEncoder()
+
+    # trainTargetEncoded = labelEncoder.fit(train[target])
+    # testTargetEncoded = labelEncoder.fit(test[target])
+
+    return train, test, data, target#, trainTargetEncoded, testTargetEncoded
 
 def classifierCaller(classifierFunction, numDataPoints):
     train, test, data, target = setupData(numDataPoints)
@@ -95,10 +105,29 @@ def classifierCaller(classifierFunction, numDataPoints):
 
     return numDataPoints, str(classifierFunction), model_acc
 
+def naiveCaller(numDataPoints):
+    train, test, data, target = setupData(numDataPoints)
+    
+    prediction = naiveBayes(train, test, data, target)
+
+    model_acc = round(
+        accuracy_score(
+            test[target], 
+            prediction
+        )*100, 2
+    )
+
+    return numDataPoints, str("Naive Bayes"), model_acc
+
 def naiveBayes(train, test, data, target):
     naiveBayes_model = GaussianNB()
 
-    naiveBayes_model.fit(train[data], train[target])
+    # multiLayerPerceptronClassifier_model.fit(dataTrainScaled, train[target])
+
+    # targetPrediction = multiLayerPerceptronClassifier_model.predict(dataTestScaled)
+
+    randomList = [[0,1,1,2,4,5,3,2,1,4],[0,1,1,2,4,5,3,2,1,4]]
+    naiveBayes_model.fit(train[data].values, train[target].astype('string'))
     
     return naiveBayes_model.predict(test[data])
 

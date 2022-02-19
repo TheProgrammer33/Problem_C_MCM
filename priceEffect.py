@@ -4,18 +4,15 @@ def setPriceEffectToFile():
     datastream = pd.read_csv("./Data/finalData.csv")
 
     outfile = open("./Data/finalData.csv", "w")
-    outfile.write("Date,USD (PM),BTC Price,GoldDelta,BitcoinDelta,GoldPriceEffect,BitcoinPriceEffect\n")
+    outfile.write("Index,Date,Gold Price,BTC Price,GoldDelta,BitcoinDelta,GoldPriceEffect,BitcoinPriceEffect\n")
 
-    prevValGold = datastream["USD (PM)"][0]
+    prevValGold = datastream["Gold Price"][0]
     prevValBTC = datastream["BTC Price"][0]
-    outfile.write(datastream["Date"][0] + "," + str(prevValGold) + "," + str(prevValBTC) + ",0,0,2,2\n")
 
-    count = 1
-
-    for date in datastream["Date"][1:]:
-        outfile.write(date + ",")
-        curValGold = datastream["USD (PM)"][count]
-        curValBTC = datastream["BTC Price"][count]
+    for i in range(len(datastream["Date"])):
+        outfile.write(str(i) + "," + datastream["Date"][i] + ",")
+        curValGold = datastream["Gold Price"][i]
+        curValBTC = datastream["BTC Price"][i]
         outfile.write(str(curValGold) + "," + str(curValBTC) + ",")
         deltaGold = round(curValGold - prevValGold, 4)
         deltaBTC = round(curValBTC - prevValBTC, 4)
@@ -38,5 +35,4 @@ def setPriceEffectToFile():
             outfile.write("2")
         prevValBTC = curValBTC
 
-        count+=1
         outfile.write("\n")
