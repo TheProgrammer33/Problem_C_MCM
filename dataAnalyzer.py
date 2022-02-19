@@ -143,3 +143,10 @@ def getDaysInMonth(month):
         return monthsDayCounts[months.index(month)]
     else:
         return 31
+
+def getMissingPrices():
+    missingPriceDates = []
+    for priceIndex in range(len(goldExchange["USD (PM)"])):
+        if (goldExchange["USD (PM)"][priceIndex]):
+            missingPriceDates.append(goldExchange["Date"][priceIndex])
+    return missingPriceDates
