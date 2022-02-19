@@ -27,7 +27,8 @@ def main():
     priceEffect.setPriceEffectToFile()
 
     t0 = time.time()
-    automateClassifierTester()
+    #automateClassifierTester()
+    classificationModels.regressionAttempt(100)
     t1 = time.time()
     print("Time Required: " + str(t1-t0))
 

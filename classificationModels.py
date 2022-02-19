@@ -15,7 +15,7 @@ from sklearn import metrics
 # Model Classifiers
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 
@@ -96,6 +96,19 @@ def setupData(numDataPoints):
 
     return train, test, data, target#, trainTargetEncoded, testTargetEncoded
 
+def regressionAttempt(numDataPoints):
+    train, test, data, target = setupData(numDataPoints)
+
+    decisionTreeRegressor_model = DecisionTreeRegressor()
+
+    decisionTreeRegressor_model.fit(train[data], train[target])
+
+    targetPrediction = decisionTreeRegressor_model.predict(test[data])
+
+    print('Mean Absolute Error:', metrics.mean_absolute_error(test[target], targetPrediction))  
+    print('Mean Squared Error:', metrics.mean_squared_error(test[target], targetPrediction))  
+    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(test[target], targetPrediction))) 
+
 def classifierCaller(classifierFunction, numDataPoints):
     train, test, data, target = setupData(numDataPoints)
     
@@ -110,12 +123,7 @@ def naiveCaller(numDataPoints):
     
     prediction = naiveBayes(train, test, data, target)
 
-    model_acc = round(
-        accuracy_score(
-            test[target], 
-            prediction
-        )*100, 2
-    )
+    model_acc = round(accuracy_score(test[target], prediction)*100, 2)
 
     return numDataPoints, str("Naive Bayes"), model_acc
 
