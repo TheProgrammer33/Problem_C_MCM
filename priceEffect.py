@@ -3,12 +3,12 @@ import pandas as pd
 def setPriceEffectToFile():
     datastream = pd.read_csv("./Data/finalData.csv")
 
-    outfile = open("Data/finaldataPE.csv", "w")
+    outfile = open("./Data/finalData.csv", "w")
     outfile.write("Date,USD (PM),BTC Price,GoldDelta,BitcoinDelta,GoldPriceEffect,BitcoinPriceEffect\n")
 
     prevValGold = datastream["USD (PM)"][0]
     prevValBTC = datastream["BTC Price"][0]
-    outfile.write(datastream["Date"][0] + "," + str(prevValGold) + "," + str(prevValBTC) + ",null,-1,null,-1\n")
+    outfile.write(datastream["Date"][0] + "," + str(prevValGold) + "," + str(prevValBTC) + ",0,0,2,2\n")
 
     count = 1
 
