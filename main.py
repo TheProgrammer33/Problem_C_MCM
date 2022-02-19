@@ -13,14 +13,22 @@ def main():
     priceEffect.setPriceEffectToFile()
 
     t0 = time.time()
-    #automateClassifierTester()
     btcGoldDF = pd.read_csv('./Data/finalData.csv')
+    results = {"Training Days": [], "Prediction": [], "Actual": [], "Accurate": []}
+
     for trainingDays in range(10, len(btcGoldDF)-11):
         lastTrainingDayPrice = btcGoldDF["Gold Price"][trainingDays]
-        predictionForNextDay = regressionModels.DecisionTree(trainingDays)[0]
-        actualPrice = btcGoldDF["Gold Price"][trainingDays+1]
-        print("Prediction: " + getRiseFall(lastTrainingDayPrice, predictionForNextDay))
-        print("Actual: " + getRiseFall(lastTrainingDayPrice, actualPrice))
+        predictionForNextDay = getRiseFall(lastTrainingDayPrice, regressionModels.DecisionTree(trainingDays)[0])
+        actualNextDay = getRiseFall(lastTrainingDayPrice, btcGoldDF["Gold Price"][trainingDays+1])
+
+        results["Training Days"].append(lastTrainingDayPrice)
+        results["Prediction"].append(predictionForNextDay)
+        results["Actual"].append(actualNextDay)
+        results["Accurate"].append(1 if predictionForNextDay == actualNextDay else 0)
+
+    resultDF = pd.DataFrame(results)
+    resultDF.to_csv('./Data/trainingResults.csv', index=False, columns=["Training Days", "Prediction", "Actual", "Accurate"])
+    
     t1 = time.time()
     print("Time Required: " + str(t1-t0))
 

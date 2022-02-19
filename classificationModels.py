@@ -24,7 +24,7 @@ def setupData(numDataPoints):
     
     train, test = train_test_split(configuredDataSizeDF, test_size=0.15)
 
-    return train, test, data, target#, trainTargetEncoded, testTargetEncoded
+    return train, test, data, target
 
 def classifierCaller(classifierFunction, numDataPoints):
     train, test, data, target = setupData(numDataPoints, True)
