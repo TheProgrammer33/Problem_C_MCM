@@ -1,17 +1,18 @@
 # General imports
 import pandas as pd
-from sklearn.ensemble import RandomForestRegressor
 
 # Model Training / Testing
 from sklearn.model_selection import train_test_split
-from sklearn.neural_network import MLPRegressor
-from sklearn.neighbors import KNeighborsRegressor
 from sklearn.linear_model import BayesianRidge
 from sklearn.linear_model import SGDRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 
 # Model Regession
+import xgboost
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.neural_network import MLPRegressor
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.ensemble import RandomForestRegressor
 
 def setupData(numDataPoints, predictFuture):
     btcGoldDF = pd.read_csv('./Data/finalData.csv')
@@ -19,7 +20,7 @@ def setupData(numDataPoints, predictFuture):
     configuredDataSizeDF = btcGoldDF.iloc[:numDataPoints]
 
     data = ['Index']
-    target = 'Gold Price'
+    target = 'BTC Price'
 
     if (predictFuture):
         train, test = getFutureData(btcGoldDF, numDataPoints)
@@ -114,6 +115,17 @@ def gradientBoosting(numDataPoints):
     sdg_model.fit(train[data], train[target])
 
     targetPrediction = sdg_model.predict(test[data])
+
+    return targetPrediction
+
+def XGBoost(numDataPoints):
+    train, test, data, target = setupData(numDataPoints, True)
+
+    kNeighborsRegressor_model = KNeighborsRegressor()
+
+    kNeighborsRegressor_model.fit(train[data], train[target])
+
+    targetPrediction = kNeighborsRegressor_model.predict(test[data])
 
     return targetPrediction
 

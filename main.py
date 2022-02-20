@@ -15,9 +15,9 @@ def predictDays(bs, startDay):
     results = {"Training Days": [], "Prediction": [], "Actual": [], "Accurate": []}
 
     for trainingDays in range(startDay, len(btcGoldDF)-1):
-        lastTrainingDayPrice = btcGoldDF["Gold Price"][trainingDays]
-        predictionForNextDay = getRiseFall(lastTrainingDayPrice, regressionModels.RandomForest(trainingDays)[0])
-        actualNextDay = getRiseFall(lastTrainingDayPrice, btcGoldDF["Gold Price"][trainingDays+1])
+        lastTrainingDayPrice = btcGoldDF["BTC Price"][trainingDays]
+        predictionForNextDay = getRiseFall(lastTrainingDayPrice, regressionModels.DecisionTree(trainingDays)[0])
+        actualNextDay = getRiseFall(lastTrainingDayPrice, btcGoldDF["BTC Price"][trainingDays+1])
 
         results["Training Days"].append(lastTrainingDayPrice)
         results["Prediction"].append(predictionForNextDay)
@@ -25,21 +25,20 @@ def predictDays(bs, startDay):
         results["Accurate"].append(1 if predictionForNextDay == actualNextDay else 0)
 
     resultDF = pd.DataFrame(results)
-    resultDF.to_csv('./MLPredictionResults/trainingResults' + str(startDay) +'.csv', index=False, columns=["Training Days", "Prediction", "Actual", "Accurate"])
+    resultDF.to_csv('./Data/DecisionTreeBTC/trainingResults' + str(startDay) +'.csv', index=False, columns=["Training Days", "Prediction", "Actual", "Accurate"])
 
     summedPredictions = 0
     for accurate in results["Accurate"]:
         summedPredictions += accurate * 100
     
     accuracy = summedPredictions / len(results["Accurate"])
-    outfile = open('./MLPredictionResults/trainingResults' + str(startDay) + '.csv', "a")
+    outfile = open('./Data/DecisionTreeBTC/trainingResults' + str(startDay) + '.csv', "a")
     outfile.write(str(accuracy))
     outfile.close()
 
-
 def train():
     # Change range values (start day, lastStartDay)
-    for startDay in range(11, 15, NUM_PROC):
+    for startDay in range(15, 300, NUM_PROC):
         jobs = []
 
         for i in range(NUM_PROC):
