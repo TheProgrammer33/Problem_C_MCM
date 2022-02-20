@@ -44,7 +44,7 @@ def setupDataRiseFall(numDataPoints):
     return train, test, DATA, PREDICTION
 
 def predictDay(model, day):
-    train, test = getFutureData(day-1)
+    train, test = getFutureData(day)
 
     return model.predict(test[DATA])
 
@@ -59,17 +59,17 @@ def DecisionTree(numDataPoints):
     #train, test, data, target = setupData(numDataPoints, True)
     train, test, data, target = setupDataRiseFall(numDataPoints)
 
-    decisionTreeRegressor_model = DecisionTreeRegressor()
+    decisionTreeRegressor_model = DecisionTreeRegressor(random_state=1)
 
     decisionTreeRegressor_model.fit(train[data], train[target])
 
-    targetPrediction = decisionTreeRegressor_model.predict(test[data])
+    #targetPrediction = decisionTreeRegressor_model.predict(test[data])
 
     # print('Mean Absolute Error:', metrics.mean_absolute_error(test[target], targetPrediction))  
     # print('Mean Squared Error:', metrics.mean_squared_error(test[target], targetPrediction))  
     # print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(test[target], targetPrediction)))
 
-    return targetPrediction
+    return decisionTreeRegressor_model
 
 def RandomForest(numDataPoints):
     train, test, data, target = setupData(numDataPoints, True)
@@ -159,6 +159,21 @@ def XGBoost(numDataPoints):
 
 def getFutureData(numDataPoints):
     train = BTCGOLDDF.iloc[:numDataPoints]
-    test = BTCGOLDDF.iloc[numDataPoints:]
+    test = BTCGOLDDF.iloc[numDataPoints:numDataPoints+1]
 
     return train, test
+
+def setRiseFallDays(startDay):
+    global BTCGOLDDF
+    BTCGOLDDF = pd.read_csv('./Data/finalData.csv')
+
+    global riseDays, fallDays
+    riseDays = BTCGOLDDF[DATA[0]][startDay]
+    fallDays = BTCGOLDDF[DATA[1]][startDay]
+
+def addRiseFallDays(day, rise, fall):
+    riseDays = rise
+    fallDays = fall
+
+    BTCGOLDDF.loc[day, DATA[0]] = riseDays
+    BTCGOLDDF.loc[day, DATA[1]] = fallDays
