@@ -19,8 +19,8 @@ def setupData(numDataPoints, predictFuture):
 
     configuredDataSizeDF = btcGoldDF.iloc[:numDataPoints]
 
-    data = ['Index']
-    target = 'BTC Price'
+    data = ['BTC Price']
+    target = 'Gold Price'
 
     if (predictFuture):
         train, test = getFutureData(btcGoldDF, numDataPoints)
@@ -62,7 +62,8 @@ def RandomForest(numDataPoints):
 def MLPNN(numDataPoints):
     train, test, data, target = setupData(numDataPoints, True)
 
-    multiLayerPerceptronRegressor_model = MLPRegressor(hidden_layer_sizes=(64,64,64),activation="relu" ,random_state=1, max_iter=2000)
+    multiLayerPerceptronRegressor_model = MLPRegressor(hidden_layer_sizes=(100,),
+        activation="relu", learning_rate='adaptive', learning_rate_init=0.01)
 
     multiLayerPerceptronRegressor_model.fit(train[data], train[target])
 
@@ -110,7 +111,7 @@ def sdg(numDataPoints):
 def gradientBoosting(numDataPoints):
     train, test, data, target = setupData(numDataPoints, True)
 
-    sdg_model = GradientBoostingRegressor()
+    sdg_model = GradientBoostingRegressor(n_estimators=750, learning_rate=1)
 
     sdg_model.fit(train[data], train[target])
 
@@ -130,7 +131,7 @@ def XGBoost(numDataPoints):
     return targetPrediction
 
 def getFutureData(df, numDataPoints):
-    train = df.iloc[:numDataPoints]
-    test = df.iloc[numDataPoints+1:]
+    train = df.iloc[:numDataPoints+1]
+    test = df.iloc[numDataPoints:]
 
     return train, test

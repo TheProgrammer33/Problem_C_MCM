@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from datetime import datetime
 
 import dataAnalyzer
 
@@ -8,8 +9,9 @@ def combineCSVs():
     btcDF = pd.read_csv('./Data/BCHAIN-MKPRU.csv')
 
     df = goldDF.join(btcDF['BTC Price'])
+    df = df.join(getDatesDataFrame(df))
 
-    df.to_csv('./Data/finalData.csv', index=True)
+    df.to_csv('./Data/finalData.csv', index=False)
 
 def insert_row(idx, df, df_insert):
     dfA = df.iloc[:idx]
@@ -44,3 +46,14 @@ def fixGold():
         goldDF.loc[positions[i]] = dates[i], goldDF['USD (PM)'][positions[i]-1]
 
     goldDF.to_csv('./Data/fixedGold.csv', index=False)
+
+def getDatesDataFrame(df):
+    datesDF = df['Date']
+
+    # TODO - make date object and set a dataframe with the dates as integers
+    for date in datesDF:
+        dateObject = datetime.date(int("20" + dataAnalyzer.getYear(date)), int(dataAnalyzer.getMonth(date)), int(dataAnalyzer.getDay(date)))
+
+
+
+    return datesDF
