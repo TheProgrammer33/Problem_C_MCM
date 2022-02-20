@@ -24,17 +24,17 @@ def predictDays(startDay):
         results["Actual"].append(actualNextDay)
         results["Accurate"].append(1 if predictionForNextDay == actualNextDay else 0)
 
-    resultDF = pd.DataFrame(results)
-    resultDF.to_csv('./Data/DecisionTreeBTC/trainingResults' + str(startDay) +'.csv', index=False, columns=["Training Days", "Prediction", "Actual", "Accurate"])
+    # resultDF = pd.DataFrame(results)
+    # resultDF.to_csv('./Data/DecisionTreeBTC/trainingResults' + str(startDay) +'.csv', index=False, columns=["Training Days", "Prediction", "Actual", "Accurate"])
 
     summedPredictions = 0
     for accurate in results["Accurate"]:
         summedPredictions += accurate * 100
     
-    accuracy = summedPredictions / len(results["Accurate"])
-    outfile = open('./Data/DecisionTreeBTC/trainingResults' + str(startDay) + '.csv', "a")
-    outfile.write(str(accuracy))
-    outfile.close()
+    # accuracy = summedPredictions / len(results["Accurate"])
+    # outfile = open('./Data/DecisionTreeBTC/trainingResults' + str(startDay) + '.csv', "a")
+    # outfile.write(str(accuracy))
+    # outfile.close()
 
     if (accuracy > 50):
         resultDF = pd.DataFrame(results)
