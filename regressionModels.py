@@ -3,31 +3,46 @@ import pandas as pd
 
 # Model Training / Testing
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import BayesianRidge
-from sklearn.linear_model import SGDRegressor
-from sklearn.ensemble import GradientBoostingRegressor
 
 # Model Regession
-import xgboost
+#import xgboost
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import BayesianRidge
+from sklearn.linear_model import SGDRegressor
+from sklearn.ensemble import GradientBoostingRegressor
+
+DATA = ['Index']
+PREDICTION = 'Gold Price'
 
 def setupData(numDataPoints, predictFuture):
-    btcGoldDF = pd.read_csv('./Data/finalData.csv')
+    global BTCGOLDDF
+    BTCGOLDDF = pd.read_csv('./Data/finalData.csv')
+    configuredDataSizeDF = BTCGOLDDF.iloc[:numDataPoints]
 
-    configuredDataSizeDF = btcGoldDF.iloc[:numDataPoints]
-
-    data = ['BTC Price']
-    target = 'Gold Price'
+    data = ['Unix Time']
+    target = 'BTC Price'
 
     if (predictFuture):
-        train, test = getFutureData(btcGoldDF, numDataPoints)
+        train, test = getFutureData(numDataPoints)
     else:
         train, test = train_test_split(configuredDataSizeDF, test_size=0.15)
 
     return train, test, data, target
+
+def predictDay(model, day):
+    train, test = getFutureData(day-1)
+
+    return model.predict(test[DATA])
+
+def retrainModel(model, day):
+    train, test = getFutureData(day)
+
+    model.fit(train[DATA], train[PREDICTION])
+
+    return model
 
 def DecisionTree(numDataPoints):
     train, test, data, target = setupData(numDataPoints, True)
@@ -111,11 +126,11 @@ def sdg(numDataPoints):
 def gradientBoosting(numDataPoints):
     train, test, data, target = setupData(numDataPoints, True)
 
-    sdg_model = GradientBoostingRegressor(n_estimators=750, learning_rate=1)
+    gradientBoosting_model = GradientBoostingRegressor(n_estimators=750, learning_rate=1)
 
-    sdg_model.fit(train[data], train[target])
+    gradientBoosting_model.fit(train[data], train[target])
 
-    targetPrediction = sdg_model.predict(test[data])
+    targetPrediction = gradientBoosting_model.predict(test[data])
 
     return targetPrediction
 
@@ -130,8 +145,8 @@ def XGBoost(numDataPoints):
 
     return targetPrediction
 
-def getFutureData(df, numDataPoints):
-    train = df.iloc[:numDataPoints+1]
-    test = df.iloc[numDataPoints:]
+def getFutureData(numDataPoints):
+    train = BTCGOLDDF = pd.read_csv('./Data/finalData.csv').iloc[:numDataPoints+1]
+    test = BTCGOLDDF = pd.read_csv('./Data/finalData.csv').iloc[numDataPoints:]
 
     return train, test

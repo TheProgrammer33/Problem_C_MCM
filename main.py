@@ -9,17 +9,15 @@ import priceEffect
 
 NUM_PROC = 4
 
-btcGoldDF = pd.read_csv('./Data/finalData.csv')
-
 def predictDays(startDay):
-    results = {"Training Days": [], "Prediction": [], "Actual": [], "Accurate": []}
+    results = {"Price": [], "Prediction": [], "Actual": [], "Accurate": []}
 
-    for trainingDays in range(startDay, startDay+200):
+    for trainingDays in range(startDay, len(btcGoldDF)-1):
         lastTrainingDayPrice = btcGoldDF["Gold Price"][trainingDays]
         predictionForNextDay = getRiseFall(lastTrainingDayPrice, regressionModels.DecisionTree(trainingDays)[0])
         actualNextDay = getRiseFall(lastTrainingDayPrice, btcGoldDF["Gold Price"][trainingDays+1])
 
-        results["Training Days"].append(lastTrainingDayPrice)
+        results["Price"].append(lastTrainingDayPrice)
         results["Prediction"].append(predictionForNextDay)
         results["Actual"].append(actualNextDay)
         results["Accurate"].append(1 if predictionForNextDay == actualNextDay else 0)
@@ -31,21 +29,20 @@ def predictDays(startDay):
     for accurate in results["Accurate"]:
         summedPredictions += accurate * 100
     
-    # accuracy = summedPredictions / len(results["Accurate"])
+    accuracy = summedPredictions / len(results["Accurate"])
     # outfile = open('./Data/DecisionTreeBTC/trainingResults' + str(startDay) + '.csv', "a")
     # outfile.write(str(accuracy))
     # outfile.close()
 
-    if (accuracy > 50):
+    if (accuracy < 50):
         resultDF = pd.DataFrame(results)
-        resultDF.to_csv('./NeuralNetworkResults/trainingResults' + str(startDay) +'.csv', index=False, columns=["Price", "Prediction", "Actual", "Accurate"])
+        resultDF.to_csv('./Data/GradientBoosterGold/trainingResults' + str(startDay) +'.csv', index=False, columns=["Price", "Prediction", "Actual", "Accurate"])
 
-        accuracy = summedPredictions / len(results["Accurate"])
-        outfile = open('./NeuralNetworkResults/trainingResults' + str(startDay) + '.csv', "a")
+        outfile = open('./Data/GradientBoosterGold/trainingResults' + str(startDay) + '.csv', "a")
         outfile.write(str(accuracy))
         outfile.close()
     else:
-        outfile = open('./NeuralNetworkResults/badTrainingResults.csv', "a")
+        outfile = open('./Data/GradientBoosterGold/badTrainingResults.csv', "a")
         outfile.write(str(startDay) + ": " + str(accuracy) + "\n")
         outfile.close()
 
@@ -75,10 +72,15 @@ def main():
     print("Starting...")
 
     dataCleaner.combineCSVs()
-    priceEffect.setPriceEffectToFile()
+    # priceEffect.setPriceEffectToFile()
+
+    global btcGoldDF
+    btcGoldDF = pd.read_csv('./Data/finalData.csv')
 
     t0 = time.time()
     predictFuture()
+    #predictWindow(7, 114, 120)
+    #predictDays(10)
     # for startDay in range(100, 200):
     #     predictDays(startDay)
     t1 = time.time()
@@ -88,6 +90,26 @@ def main():
 
     #missingDatesDict = dataAnalyzer.findMissingDates()
     #print(missingDatesDict)
+
+def trainModel(numDataPoints):
+    return regressionModels.gradientBoosting(numDataPoints)
+
+# def predictDay(model, dayIndex):
+#     model.
+
+def predictWindow(windowSize, startDay, endDay):
+    for currentDay in range(startDay, endDay):
+        results = {"Price": [], "Rise Accuracy": [], "Fall Accuracy": []}
+
+        model, predictedNextDay = trainModel(startDay)
+
+        print(predictedNextDay[0], btcGoldDF["Gold Price"][currentDay+1])
+
+        for i in range(1, windowSize+1):
+            model = regressionModels.retrainModel(model, currentDay+i)
+            predictedNextDay = regressionModels.predictDay(model, currentDay+i)
+
+            print(predictedNextDay[0], btcGoldDF["Gold Price"][currentDay+i])
 
 def predictFuture():
     for startDay in range(100, 300):

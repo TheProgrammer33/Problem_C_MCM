@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
-from datetime import datetime
+import time
+from datetime import date as Date
 
 import dataAnalyzer
 
@@ -9,7 +10,7 @@ def combineCSVs():
     btcDF = pd.read_csv('./Data/BCHAIN-MKPRU.csv')
 
     df = goldDF.join(btcDF['BTC Price'])
-    df = df.join(getDatesDataFrame(df))
+    df = df.join(getDatesDataFrame(df)["Unix Time"])
 
     df.to_csv('./Data/finalData.csv', index=False)
 
@@ -49,11 +50,12 @@ def fixGold():
 
 def getDatesDataFrame(df):
     datesDF = df['Date']
+    unixTimeList = {"Unix Time": []}
 
     # TODO - make date object and set a dataframe with the dates as integers
     for date in datesDF:
-        dateObject = datetime.date(int("20" + dataAnalyzer.getYear(date)), int(dataAnalyzer.getMonth(date)), int(dataAnalyzer.getDay(date)))
+        dateObject = Date(2000 + int(dataAnalyzer.getYear(date)), int(dataAnalyzer.getMonth(date)), int(dataAnalyzer.getDay(date)))
 
+        unixTimeList['Unix Time'].append(time.mktime(dateObject.timetuple()))
 
-
-    return datesDF
+    return pd.DataFrame(unixTimeList)
