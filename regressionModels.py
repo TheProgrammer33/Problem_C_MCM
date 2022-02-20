@@ -1,8 +1,10 @@
 # General imports
 import pandas as pd
+import numpy as np
 
 # Model Training / Testing
 from sklearn.model_selection import train_test_split
+from sklearn import metrics
 
 # Model Regession
 #import xgboost
@@ -14,7 +16,7 @@ from sklearn.linear_model import BayesianRidge
 from sklearn.linear_model import SGDRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 
-DATA = ['Index']
+DATA = ['GoldDaysSinceRise', 'GoldDaysSinceFall']
 PREDICTION = 'Gold Price'
 
 def setupData(numDataPoints, predictFuture):
@@ -22,15 +24,24 @@ def setupData(numDataPoints, predictFuture):
     BTCGOLDDF = pd.read_csv('./Data/finalData.csv')
     configuredDataSizeDF = BTCGOLDDF.iloc[:numDataPoints]
 
-    data = ['Unix Time']
-    target = 'BTC Price'
-
     if (predictFuture):
         train, test = getFutureData(numDataPoints)
     else:
         train, test = train_test_split(configuredDataSizeDF, test_size=0.15)
 
-    return train, test, data, target
+    return train, test, DATA, PREDICTION
+
+def setupDataRiseFall(numDataPoints):
+    global BTCGOLDDF
+    BTCGOLDDF = pd.read_csv('./Data/finalData.csv')
+
+    for i in range(len(BTCGOLDDF) - 1):
+        BTCGOLDDF.loc[i, "Gold Price"] = BTCGOLDDF["Gold Price"][i+1]
+        BTCGOLDDF.loc[i, "BTC Price"] = BTCGOLDDF["BTC Price"][i+1]
+
+    train, test = getFutureData(numDataPoints)
+
+    return train, test, DATA, PREDICTION
 
 def predictDay(model, day):
     train, test = getFutureData(day-1)
@@ -45,7 +56,8 @@ def retrainModel(model, day):
     return model
 
 def DecisionTree(numDataPoints):
-    train, test, data, target = setupData(numDataPoints, True)
+    #train, test, data, target = setupData(numDataPoints, True)
+    train, test, data, target = setupDataRiseFall(numDataPoints)
 
     decisionTreeRegressor_model = DecisionTreeRegressor()
 
@@ -146,7 +158,7 @@ def XGBoost(numDataPoints):
     return targetPrediction
 
 def getFutureData(numDataPoints):
-    train = BTCGOLDDF = pd.read_csv('./Data/finalData.csv').iloc[:numDataPoints+1]
-    test = BTCGOLDDF = pd.read_csv('./Data/finalData.csv').iloc[numDataPoints:]
+    train = BTCGOLDDF.iloc[:numDataPoints]
+    test = BTCGOLDDF.iloc[numDataPoints:]
 
     return train, test

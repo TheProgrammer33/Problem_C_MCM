@@ -63,33 +63,40 @@ def getDatesDataFrame(df):
 
 def getDaysSinceRiseAndFall(df):
     riseFallDict = {"BTCDaysSinceRise": [0], "BTCDaysSinceFall": [0], "GoldDaysSinceRise": [0], "GoldDaysSinceFall": [0], }
-    previous_btc = df["BTC Price"][0]
-    previous_gold = df["Gold Price"][0]
+    transactionFee = {"BTC": 0.02, "Gold": 0.01}
 
-    for day in range(len(df["BTC Price"][1:])):
-        btc_price = df["BTC Price"][day]
-        gold_price = df["Gold Price"][day]
-        if (btc_price > previous_btc):
-            riseFallDict["BTCDaysSinceFall"].append(riseFallDict["BTCDaysSinceFall"][-1])
-            riseFallDict["BTCDaysSinceRise"].append(0)
-        elif (btc_price < previous_btc):
-            riseFallDict["BTCDaysSinceFall"].append(0)
-            riseFallDict["BTCDaysSinceRise"].append(riseFallDict["BTCDaysSinceRise"][-1] + 1)
-        else:
-            riseFallDict["BTCDaysSinceFall"].append(riseFallDict["BTCDaysSinceFall"][-1] + 1)
-            riseFallDict["BTCDaysSinceRise"].append(riseFallDict["BTCDaysSinceRise"][-1] + 1)
+    for t in ["BTC", "Gold"]:
+        highestValueIndex = 0
+        lowestValueIndex = 0
+        currentDF = df[t + " Price"]
+        for day in range(len(df[t + " Price"][1:])):
+            price = currentDF[day]
+            if price < currentDF[lowestValueIndex]:
+                riseFallDict[t + "DaysSinceFall"].append(riseFallDict[t + "DaysSinceFall"][-1] + 1)
+                lowestValueIndex = day
+            elif (price > currentDF[lowestValueIndex] and price - currentDF[highestValueIndex] > (price * (transactionFee[t]))):
+                # Low Spike
+                riseFallDict[t + "DaysSinceFall"].append(0)
+                riseFallDict[t + "DaysSinceFall"][lowestValueIndex+1:] = replaceValueInList(riseFallDict[t + "DaysSinceFall"][lowestValueIndex+1:])
+                riseFallDict[t + "DaysSinceFall"][lowestValueIndex] = 0
+            elif (price >= currentDF[lowestValueIndex]):
+                riseFallDict[t + "DaysSinceFall"].append(riseFallDict[t + "DaysSinceFall"][-1] + 1)
 
-        if (gold_price > previous_gold):
-            riseFallDict["GoldDaysSinceFall"].append(riseFallDict["GoldDaysSinceFall"][-1])
-            riseFallDict["GoldDaysSinceRise"].append(0)
-        elif (gold_price < previous_gold):
-            riseFallDict["GoldDaysSinceFall"].append(0)
-            riseFallDict["GoldDaysSinceRise"].append(riseFallDict["GoldDaysSinceRise"][-1] + 1)
-        else:
-            riseFallDict["GoldDaysSinceFall"].append(riseFallDict["GoldDaysSinceFall"][-1] + 1)
-            riseFallDict["GoldDaysSinceRise"].append(riseFallDict["GoldDaysSinceRise"][-1] + 1)
+            if (price > currentDF[highestValueIndex]):
+                riseFallDict[t + "DaysSinceRise"].append(riseFallDict[t + "DaysSinceRise"][-1] + 1)
+                highestValueIndex = day
+            elif (price < currentDF[highestValueIndex] and currentDF[lowestValueIndex] - price > (price * transactionFee[t])):
+                # High Spike
+                riseFallDict[t + "DaysSinceRise"].append(0)
+                riseFallDict[t + "DaysSinceFall"][highestValueIndex+1:] = replaceValueInList(riseFallDict[t + "DaysSinceRise"][highestValueIndex+1:])
+                riseFallDict[t + "DaysSinceFall"][highestValueIndex] = 0
+            elif (price <= currentDF[highestValueIndex]):
+                riseFallDict[t + "DaysSinceRise"].append(riseFallDict[t + "DaysSinceRise"][-1] + 1)
 
-        previous_btc = btc_price
-        previous_gold = gold_price
-
-            
+    return pd.DataFrame(riseFallDict)
+    
+def replaceValueInList(l):
+    newl = []
+    for i in range(len(l)):
+        newl.append(i+1)
+    return newl

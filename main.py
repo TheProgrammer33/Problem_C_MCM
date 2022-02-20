@@ -22,19 +22,13 @@ def predictDays(startDay):
         results["Actual"].append(actualNextDay)
         results["Accurate"].append(1 if predictionForNextDay == actualNextDay else 0)
 
-    # resultDF = pd.DataFrame(results)
-    # resultDF.to_csv('./Data/DecisionTreeBTC/trainingResults' + str(startDay) +'.csv', index=False, columns=["Training Days", "Prediction", "Actual", "Accurate"])
-
     summedPredictions = 0
     for accurate in results["Accurate"]:
         summedPredictions += accurate * 100
     
     accuracy = summedPredictions / len(results["Accurate"])
-    # outfile = open('./Data/DecisionTreeBTC/trainingResults' + str(startDay) + '.csv', "a")
-    # outfile.write(str(accuracy))
-    # outfile.close()
 
-    if (accuracy < 50):
+    if (accuracy > 50):
         resultDF = pd.DataFrame(results)
         resultDF.to_csv('./Data/GradientBoosterGold/trainingResults' + str(startDay) +'.csv', index=False, columns=["Price", "Prediction", "Actual", "Accurate"])
 
@@ -71,7 +65,7 @@ def train():
 def main():
     print("Starting...")
 
-    dataCleaner.combineCSVs()
+    #dataCleaner.combineCSVs()
     # priceEffect.setPriceEffectToFile()
 
     global btcGoldDF
@@ -111,6 +105,12 @@ def predictWindow(windowSize, startDay, endDay):
 
             print(predictedNextDay[0], btcGoldDF["Gold Price"][currentDay+i])
 
+def getStartingDayAccuracy():
+    for startDay in range(100, 300):
+        results = {"Price": [], "Rise Accuracy": [], "Fall Accuracy": []}
+        for trainingDays in range(startDay, len(btcGoldDF)-1):
+            prediction = regressionModels.DecisionTree(trainingDays)
+
 def predictFuture():
     for startDay in range(100, 300):
         results = {"Price": [], "Rise Accuracy": [], "Fall Accuracy": []}
@@ -134,7 +134,6 @@ def predictFuture():
                 summedPredictions = 0
                 for accurate in results[accuracyType]:
                     summedPredictions += accurate * 100
-                
                 
                 accuracy = summedPredictions / len(results[accuracyType])
 
