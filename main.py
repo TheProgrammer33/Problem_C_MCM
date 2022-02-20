@@ -61,9 +61,6 @@ def train():
         for j in jobs:
             j.join()
 
-def spendMoney():
-    pass
-
 # The predictions are the same past the first day. It's not predicting future days, just a single value which doesn't help
 # It needs to give values for each day, not one value for every day
 # Figure out why the data going into the model isn't training it to predict properly
