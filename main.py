@@ -61,6 +61,9 @@ def train():
         for j in jobs:
             j.join()
 
+def spendMoney():
+    pass
+
 # The predictions are the same past the first day. It's not predicting future days, just a single value which doesn't help
 # It needs to give values for each day, not one value for every day
 # Figure out why the data going into the model isn't training it to predict properly
@@ -70,6 +73,9 @@ def main():
 
     global btcGoldDF
     btcGoldDF = pd.read_csv('./Data/finalData.csv')
+
+    global wallet
+    wallet = {"USD": 1000, "GOLD": 0, "BTC": 0}
 
     #dataSmoothingGold()
 
@@ -159,6 +165,8 @@ def predictFuture():
         for trainingDays in range(startDay+1, len(btcGoldDF)-1):
             model = regressionModels.retrainModel(model, trainingDays)
             prediction = regressionModels.predictDay(model, trainingDays)
+            riseSpike = 0
+            fallSpike = 0
 
             regressionModels.addRiseFallDays(trainingDays, regressionModels.riseDays+1, regressionModels.fallDays+1)
             
@@ -166,16 +174,19 @@ def predictFuture():
             try:
                 value, index = findNextTopOfSpike(predictionDF, btcGoldDF[regressionModels.PREDICTION][startDay], 0.02)
                 spike = True
+                rise += 1
             except:
                 pass
             try:
                 value, index = findNextBottomOfSpike(predictionDF, btcGoldDF[regressionModels.PREDICTION][startDay], 0.02)
                 spike = True
+                fall += 1
             except:
                 pass
 
             if spike:
                 startDay = index
+
                 # TODO - buy or sell
 
             predictionDF.iloc[-1] = [prediction, regressionModels.riseDays+1, regressionModels.fallDays+1]
