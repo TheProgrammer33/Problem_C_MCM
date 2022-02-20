@@ -6,6 +6,9 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPRegressor
 from sklearn.neighbors import KNeighborsRegressor
+from sklearn.linear_model import BayesianRidge
+from sklearn.linear_model import SGDRegressor
+from sklearn.ensemble import GradientBoostingRegressor
 
 # Model Regession
 from sklearn.tree import DecisionTreeRegressor
@@ -81,9 +84,41 @@ def kNeighbors(numDataPoints):
 
     return targetPrediction
 
+def bayesian(numDataPoints):
+    train, test, data, target = setupData(numDataPoints, True)
+
+    bayesianRidge_model = BayesianRidge()
+
+    bayesianRidge_model.fit(train[data], train[target])
+
+    targetPrediction = bayesianRidge_model.predict(test[data])
+
+    return targetPrediction
+    
+def sdg(numDataPoints):
+    train, test, data, target = setupData(numDataPoints, True)
+
+    sdg_model = SGDRegressor()
+
+    sdg_model.fit(train[data], train[target])
+
+    targetPrediction = sdg_model.predict(test[data])
+
+    return targetPrediction
+
+def gradientBoosting(numDataPoints):
+    train, test, data, target = setupData(numDataPoints, True)
+
+    sdg_model = GradientBoostingRegressor()
+
+    sdg_model.fit(train[data], train[target])
+
+    targetPrediction = sdg_model.predict(test[data])
+
+    return targetPrediction
+
 def getFutureData(df, numDataPoints):
     train = df.iloc[:numDataPoints]
-    test = df.iloc[[numDataPoints+1]]
+    test = df.iloc[numDataPoints+1:]
 
     return train, test
-

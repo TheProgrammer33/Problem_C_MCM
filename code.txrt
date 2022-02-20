@@ -1,0 +1,32 @@
+for startDay in range(100, 101):
+        results = {"Price": [], "Prediction": [], "Actual": [], "Accurate": []}
+        for trainingDays in range(startDay, len(btcGoldDF)-1):
+            prediction = regressionModels.sdg(trainingDays)
+            for predictDays in range(len(prediction)):
+                previousDay = btcGoldDF["Gold Price"][trainingDays + predictDays - 1]
+                actualNextDay = getRiseFall(previousDay, btcGoldDF["Gold Price"][trainingDays + predictDays])
+                predictionForNextDay = getRiseFall(previousDay, prediction[predictDays])
+
+                results["Price"].append(btcGoldDF["Gold Price"][predictDays])
+                results["Prediction"].append(predictionForNextDay)
+                results["Actual"].append(actualNextDay)
+                results["Accurate"].append(1 if predictionForNextDay == actualNextDay else 0)
+
+            summedPredictions = 0
+            for accurate in results["Accurate"]:
+                summedPredictions += accurate * 100
+            
+            accuracy = summedPredictions / len(results["Accurate"])
+
+            if (accuracy > 50):
+                resultDF = pd.DataFrame(results)
+                resultDF.to_csv('./NeuralNetworkResults/trainingResults' + str(trainingDays) +'.csv', index=False, columns=["Price", "Prediction", "Actual", "Accurate"])
+
+                accuracy = summedPredictions / len(results["Accurate"])
+                outfile = open('./NeuralNetworkResults/trainingResults' + str(trainingDays) + '.csv', "a")
+                outfile.write(str(accuracy))
+                outfile.close()
+            else:
+                outfile = open('./NeuralNetworkResults/badTrainingResults.csv', "a")
+                outfile.write(str(trainingDays) + ": " + str(accuracy) + "\n")
+                outfile.close()
