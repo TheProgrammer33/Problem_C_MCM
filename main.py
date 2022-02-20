@@ -152,7 +152,6 @@ def predictFuture():
                     outfile.write(str(trainingDays) + ": " + str(accuracy) + "\n")
                     outfile.close()
 
-
 def getRiseFall(previousPrice, currentPrice):
     if previousPrice > currentPrice:
         return "Fell"
