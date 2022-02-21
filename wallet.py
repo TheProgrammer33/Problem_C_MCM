@@ -14,7 +14,9 @@ class Wallet:
         return self.wallet["BTC"]
 
     def getNetWorth(self, btcPrice, goldPrice):
-        return (self.wallet["BTC"] * btcPrice * self.fees["BTC"]) + (self.wallet["Gold"] * goldPrice * self.fees["Gold"]) + self.wallet["USD"]
+        totalBTCMoney = self.wallet["BTC"] * btcPrice
+        totalGoldMoney = self.wallet["Gold"] * goldPrice
+        return (totalBTCMoney - (totalBTCMoney * self.fees["BTC"])) + (totalGoldMoney - (totalGoldMoney * self.fees["Gold"])) + self.wallet["USD"]
 
     def buy(self, product, price, numberOfProducts):
         self.wallet["USD"] -= round(price * numberOfProducts, 2)
