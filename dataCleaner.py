@@ -13,7 +13,7 @@ def combineCSVs():
     # df = df.join(getDatesDataFrame(df)["Unix Time"])
     df = df.join(getDaysSinceRiseAndFall(df))
 
-    df.to_csv('./Data/finalData.csv', index=True)
+    df.to_csv('./Data/finalData.csv', index=True, index_label="Index")
 
 def insert_row(idx, df, df_insert):
     dfA = df.iloc[:idx]

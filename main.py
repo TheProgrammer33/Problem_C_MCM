@@ -6,8 +6,10 @@ import dataAnalyzer, dataCleaner
 import regressionModels
 import classificationModels
 import priceEffect
+import wallet
 
 import matplotlib.pyplot as plt
+import math
 from scipy.signal import savgol_filter
 
 NUM_PROC = 4
@@ -68,19 +70,12 @@ def train():
 def main():
     print("Starting...")
 
-    global btcGoldDF
-    btcGoldDF = pd.read_csv('./Data/finalData.csv')
-
-    global wallet
-    wallet = {"USD": 1000, "GOLD": 0, "BTC": 0}
-
     #dataSmoothingGold()
 
-    #dataCleaner.combineCSVs()
-    #priceEffect.setPriceEffectToFile()
+    dataCleaner.combineCSVs()
 
-    # global btcGoldDF
-    # btcGoldDF = pd.read_csv('./Data/finalData.csv')
+    global btcGoldDF
+    btcGoldDF = pd.read_csv('./Data/finalData.csv')
 
     predictFuture()
     # t0 = time.time()
@@ -110,7 +105,6 @@ def dataSmoothingGold():
     plt.show()
 
     input()
-
 
 def dataSmoothingDemo():
     # noisy data
@@ -153,81 +147,71 @@ def getStartingDayAccuracy():
             prediction = regressionModels.DecisionTree(trainingDays)
 
 def predictFuture():
-    for startDay in range(50, 500):
-        results = {"Price": [], "Rise Accuracy": [], "Fall Accuracy": []}
-        predictionDF = pd.DataFrame(columns=['Price', 'Rise', 'Fall'])
+    myWallet = wallet.Wallet()
+    for startDay in range(10, len(btcGoldDF)-1):
+        for product in ["BTC", "Gold"]:
+            regressionModels.PREDICTION = product + ' Price'
+            regressionModels.DATA = [product + 'DaysSinceRise', product + 'DaysSinceFall']
+            predictionDF = pd.DataFrame(columns=['Price', 'Rise', 'Fall'])
 
-        regressionModels.setRiseFallDays(startDay)
-        model = regressionModels.DecisionTree(startDay)
-        for trainingDays in range(startDay+1, len(btcGoldDF)-1):
-            model = regressionModels.retrainModel(model, trainingDays)
-            prediction = regressionModels.predictDay(model, trainingDays)
-            riseSpike = 0
-            fallSpike = 0
+            regressionModels.setRiseFallDays(startDay)
+            model = regressionModels.DecisionTree(startDay)
+            for trainingDays in range(startDay+1, len(btcGoldDF)-1):
+                predictionDict = {'Price': [], 'Rise': [], 'Fall': []}
+                spike = False
+                rise = 0
+                fall = 0
 
-            regressionModels.addRiseFallDays(trainingDays, regressionModels.riseDays+1, regressionModels.fallDays+1)
-            
-            # TODO - check if rise or fall, distinguish which, get index of spike, break loop
-            try:
-                value, index = findNextTopOfSpike(predictionDF, btcGoldDF[regressionModels.PREDICTION][startDay], 0.02)
-                spike = True
-                rise += 1
-            except:
-                pass
-            try:
-                value, index = findNextBottomOfSpike(predictionDF, btcGoldDF[regressionModels.PREDICTION][startDay], 0.02)
-                spike = True
-                fall += 1
-            except:
-                pass
+                model = regressionModels.retrainModel(model, trainingDays)
+                prediction = regressionModels.predictDay(model, trainingDays)
 
-            if spike:
-                startDay = index
-
-                # TODO - buy or sell
-
-            predictionDF.iloc[-1] = [prediction, regressionModels.riseDays+1, regressionModels.fallDays+1]
-
-        resizedDF = btcGoldDF.iloc[startDay:]
-        plt.ion()
-        plt.plot(resizedDF['Index'], prediction)
-        plt.show()
-
-        input()
-            
-            # risePrice, riseIndex = findNextTopOfSpike(prediction, btcGoldDF["Gold Price"][trainingDays], 0.02)
-            # fallPrice, fallIndex = findNextBottomOfSpike(prediction, btcGoldDF["Gold Price"][trainingDays], 0.02)
-
-            # previousDay = btcGoldDF["Gold Price"][trainingDays + riseIndex - 1]
-            # actualRiseDay = getRiseFall(previousDay, btcGoldDF["Gold Price"][trainingDays + riseIndex])
-            # actualFallDay = getRiseFall(previousDay, btcGoldDF["Gold Price"][trainingDays + fallIndex])
-            # risePrediction = getRiseFall(previousDay, risePrice)
-            # fallPrediction = getRiseFall(previousDay, fallPrice)
-
-            # results["Price"].append(btcGoldDF["Gold Price"][predictDays])
-            # results["Rise Accuracy"].append(1 if risePrediction == actualRiseDay else 0)
-            # results["Fall Accuracy"].append(1 if fallPrediction == actualFallDay else 0)
-            
-            # for accuracyType in ["Rise Accuracy", "Fall Accuracy"]:
-            #     summedPredictions = 0
-            #     for accurate in results[accuracyType]:
-            #         summedPredictions += accurate * 100
+                regressionModels.addRiseFallDays(trainingDays, regressionModels.riseDays+1, regressionModels.fallDays+1)
                 
-            #     accuracy = summedPredictions / len(results[accuracyType])
+                predictionDict["Price"] = prediction
+                predictionDict["Rise"] = regressionModels.riseDays+1
+                predictionDict["Fall"] = regressionModels.fallDays+1
+                predictionDF = pd.concat([predictionDF, pd.DataFrame(predictionDict)])
 
-            #     if (accuracy > 50):
-            #         resultDF = pd.DataFrame(results)
-            #         resultDF.to_csv('./NeuralNetworkResults/trainingResults' + str(trainingDays) +'.csv',
-            #             index=False, columns=["Price", "Rise Accuracy", "Fall Accuracy"])
+                # TODO - check if rise or fall, distinguish which, get index of spike, break loop
+                try:
+                    value, index = findNextTopOfSpike(predictionDF["Price"], btcGoldDF[regressionModels.PREDICTION][startDay], myWallet.fees[product])
+                    spike = True
+                    rise += 1
+                except:
+                    pass
 
-            #         accuracy = summedPredictions / len(results[accuracyType])
-            #         outfile = open('./NeuralNetworkResults/trainingResults' + str(trainingDays) + '.csv', "a")
-            #         outfile.write(str(accuracy))
-            #         outfile.close()
-            #     else:
-            #         outfile = open('./NeuralNetworkResults/badTrainingResults.csv', "a")
-            #         outfile.write(str(trainingDays) + ": " + str(accuracy) + "\n")
-            #         outfile.close()
+                try:
+                    value, index = findNextBottomOfSpike(predictionDF["Price"], btcGoldDF[regressionModels.PREDICTION][startDay], myWallet.fees[product])
+                    spike = True
+                    fall += 1
+                except:
+                    pass
+
+                if spike:
+                    startDay = index
+                    # TODO - buy or sell
+                    availableMoney = myWallet.getAvailableMoney()
+                    price = round(predictionDF.iloc[index]["Price"], 2)
+                    if (rise):
+                        if (myWallet.wallet[product]):
+                            numberOfProducts = (math.floor(myWallet.wallet[product] / price))
+                            if price*numberOfProducts > myWallet.wallet[product]:
+                                numberOfProducts -= 1
+                            if numberOfProducts <= 0:
+                                continue
+                            myWallet.sell(product, price, numberOfProducts)
+                            break
+                    if (fall):
+                        numberOfProducts = (math.floor(availableMoney / price))
+                        if price*numberOfProducts > availableMoney:
+                            numberOfProducts -= 1
+                        if numberOfProducts <= 0:
+                            continue
+                        myWallet.buy(product, price, numberOfProducts)
+                        break
+
+    print(myWallet)
+
 
 def getRiseFall(previousPrice, currentPrice):
     if previousPrice > currentPrice:
@@ -257,28 +241,33 @@ def predictPurchase(df, day):
     gold_profit = gold_gains - (gold_gains * 0.01)
 
 def findNextBottomOfSpike(prediction, startDayPrice, fee):
-    heighestValue = startDayPrice
+    lowIndex = 0
+    highestValue = startDayPrice
     lowestValue = startDayPrice
-    for p in prediction:
+    for index in range(len(prediction)):
+        p = prediction.iloc[index]
         if p < lowestValue:
             lowestValue = p
-        elif (p > lowestValue and p - heighestValue > (p * fee)):
-            return lowestValue, prediction.index(p)
+            lowIndex = index
+        elif (p > lowestValue and highestValue - p  > (p * fee)):
+            return lowestValue, lowIndex
         
-        if (p > heighestValue):
-            heighestValue = p
+        if (p > highestValue):
+            highestValue = p
 
 def findNextTopOfSpike(prediction, startDayPrice, fee):
-    heighestValue = startDayPrice
+    highIndex = 0
+    highestValue = startDayPrice
     lowestValue = startDayPrice
-    for p in prediction:
-        if (p > heighestValue):
-            heighestValue = p
-        elif (p < heighestValue and lowestValue - p > (p * fee)):
-            return heighestValue, prediction.index(p)
+    for index in range(len(prediction)):
+        p = prediction.iloc[index]
+        if (p > highestValue):
+            highestValue = p
+            highIndex = index
+        elif (p < highestValue and p - lowestValue > (p * fee)):
+            return highestValue, highIndex
         
         if p < lowestValue:
             lowestValue = p
-
 
 main()

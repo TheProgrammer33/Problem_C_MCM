@@ -102,39 +102,6 @@ def MLPNN(numDataPoints):
 
     return targetPrediction
 
-def kNeighbors(numDataPoints):
-    train, test, data, target = setupData(numDataPoints, True)
-
-    kNeighborsRegressor_model = KNeighborsRegressor()
-
-    kNeighborsRegressor_model.fit(train[data], train[target])
-
-    targetPrediction = kNeighborsRegressor_model.predict(test[data])
-
-    return targetPrediction
-
-def bayesian(numDataPoints):
-    train, test, data, target = setupData(numDataPoints, True)
-
-    bayesianRidge_model = BayesianRidge()
-
-    bayesianRidge_model.fit(train[data], train[target])
-
-    targetPrediction = bayesianRidge_model.predict(test[data])
-
-    return targetPrediction
-    
-def sdg(numDataPoints):
-    train, test, data, target = setupData(numDataPoints, True)
-
-    sdg_model = SGDRegressor()
-
-    sdg_model.fit(train[data], train[target])
-
-    targetPrediction = sdg_model.predict(test[data])
-
-    return targetPrediction
-
 def gradientBoosting(numDataPoints):
     train, test, data, target = setupData(numDataPoints, True)
 

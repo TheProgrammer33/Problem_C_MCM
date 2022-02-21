@@ -2,19 +2,17 @@ class Wallet:
 
     def __init__(self) -> None:
         self.wallet = {"USD": 1000, "Gold": 0, "BTC": 0}
+        self.fees = {"Gold": 0.01, "BTC": 0.02}
     
-    def buyBTC(self, price):
-        self.wallet["USD"] -= price
-        self.wallet["BTC"] += price
+    def getAvailableMoney(self):
+        return self.wallet["USD"]
 
-    def sellBTC(self, price):
-        self.wallet["USD"] += price
-        self.wallet["BTC"] -= price
+    def buy(self, product, price, numberOfProducts):
+        self.wallet["USD"] -= round(price * numberOfProducts, 2)
+        self.wallet[product] += numberOfProducts
+        self.wallet["USD"] -= round(price * numberOfProducts * self.fees[product], 2)
 
-    def buyGold(self, price):
-        self.wallet["USD"] -= price
-        self.wallet["Gold"] += price
-
-    def sellGold(self, price):
-        self.wallet["USD"] += price
-        self.wallet["Gold"] -= price
+    def sell(self, product, price, numberOfProducts):
+        self.wallet["USD"] += round(price * numberOfProducts, 2)
+        self.wallet[product] -= numberOfProducts
+        self.wallet["USD"] -= round(price * numberOfProducts * self.fees[product], 2)
