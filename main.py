@@ -136,6 +136,12 @@ def predictFuture():
         if (not changes):
             startDay += 1
 
+    for product in ["BTC", "Gold"]:
+        if (myWallet.wallet[product] > 0):
+            actualPrice = btcGoldDF.iloc[startDay + index][product + " Price"]
+            print("Selling " + str(myWallet.wallet[product]) + " " + product)
+            myWallet.sell(product, actualPrice)
+
     print(myWallet.wallet)
     
     spikeTraderDF = pd.DataFrame(spikeTrader)
