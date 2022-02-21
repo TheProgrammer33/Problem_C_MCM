@@ -12,7 +12,8 @@ class Wallet:
         self.wallet[product] += numberOfProducts
         self.wallet["USD"] -= round(price * numberOfProducts * self.fees[product], 2)
 
-    def sell(self, product, price, numberOfProducts):
+    def sell(self, product, price):
+        numberOfProducts = self.wallet[product]
         self.wallet["USD"] += round(price * numberOfProducts, 2)
         self.wallet[product] -= numberOfProducts
         self.wallet["USD"] -= round(price * numberOfProducts * self.fees[product], 2)

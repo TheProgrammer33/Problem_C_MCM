@@ -79,7 +79,6 @@ def predictFuture():
                     rise += 1
                 except:
                     pass
-
                 try:
                     value, index = findNextBottomOfSpike(predictionDF["Price"], btcGoldDF[regressionModels.PREDICTION][startDay], myWallet.fees[product])
                     spike = True
@@ -93,7 +92,8 @@ def predictFuture():
                     if (rise):
                         if (myWallet.wallet[product] > 0):
                             actualPrice = btcGoldDF.iloc[startDay + index][product + " Price"]
-                            myWallet.sell(product, actualPrice, numberOfProducts)
+                            print("Selling " + str(myWallet.wallet[product]) + " " + product)
+                            myWallet.sell(product, actualPrice)
                             startDay += index
                             break
                     if (fall):
@@ -103,6 +103,7 @@ def predictFuture():
                             numberOfProducts -= 1
                         if numberOfProducts <= 0:
                             continue
+                        print("Buying " + str(numberOfProducts) + " " + product)
                         myWallet.buy(product, actualPrice, numberOfProducts)
                         startDay += index
                         break
