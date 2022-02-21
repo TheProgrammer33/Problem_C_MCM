@@ -1,10 +1,8 @@
 # General imports
 import pandas as pd
-import numpy as np
 
 # Model Training / Testing
 from sklearn.model_selection import train_test_split
-from sklearn import metrics
 
 # Model Regession
 #import xgboost
@@ -12,8 +10,6 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import BayesianRidge
-from sklearn.linear_model import SGDRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 
 DATA = ['GoldDaysSinceRise', 'GoldDaysSinceFall']

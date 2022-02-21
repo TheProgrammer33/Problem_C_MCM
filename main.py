@@ -1,40 +1,10 @@
-from tracemalloc import start
 import pandas as pd
-import time
-from multiprocessing import Process
 
-import dataAnalyzer, dataCleaner
-import regressionModels
-import classificationModels
-import wallet
+import dataCleaner, regressionModels, wallet
 
-import matplotlib.pyplot as plt
 import math
-from scipy.signal import savgol_filter
 
 NUM_PROC = 4
-
-def train():
-    # Change range values (start day, lastStartDay)
-    for startDay in range(15, 300, NUM_PROC):
-        jobs = []
-
-        for i in range(NUM_PROC):
-            process = Process(
-                target=predictDays, 
-                args=(startDay+i,)
-            )
-            jobs.append(process)
-
-        for j in jobs:
-            j.start()
-
-        for j in jobs:
-            j.join()
-
-# The predictions are the same past the first day. It's not predicting future days, just a single value which doesn't help
-# It needs to give values for each day, not one value for every day
-# Figure out why the data going into the model isn't training it to predict properly
 
 def main():
     print("Starting...")

@@ -1,6 +1,3 @@
-from calendar import leapdays
-from tracemalloc import start
-from numpy import NaN
 import pandas as pd
 import math
 bitCoinExchange = pd.read_csv("./Data/BCHAIN-MKPRU.csv")
