@@ -1,3 +1,4 @@
+from tracemalloc import start
 import pandas as pd
 import time
 from multiprocessing import Process
@@ -47,6 +48,7 @@ def main():
 
 def predictFuture():
     # TODO - find best starting day
+    spikeTraderDF = pd.DataFrame(columns=['Date', 'USD', 'Gold', 'BTC', 'Total Net Worth'])
     myWallet = wallet.Wallet()
     startDay = 10
     while startDay < len(btcGoldDF):
@@ -100,6 +102,7 @@ def predictFuture():
                             myWallet.sell(product, actualPrice)
                             startDay += index+1
                             changes = True
+                            spikeTraderDF.iloc[-1] = {'Date': btcGoldDF['Date'][startDay + index], 'USD': myWallet.getAvailableMoney(), 'Gold': myWallet.getGoldAmount(), 'BTC': myWallet.getBTCAmount(), 'Total Net Worth After Tax': myWallet.getNetWorth(btcGoldDF['BTC Price'][startDay+index], btcGoldDF['Gold Price'][startDay+index])}
                             break
                     if (fall):
                         actualPrice = btcGoldDF.iloc[startDay + index][product + " Price"]
@@ -113,12 +116,14 @@ def predictFuture():
                         myWallet.buy(product, actualPrice, numberOfProducts)
                         startDay += index+1
                         changes = True
+                        spikeTraderDF.iloc[-1] = {'Date': btcGoldDF['Date'][startDay + index], 'USD': myWallet.getAvailableMoney(), 'Gold': myWallet.getGoldAmount(), 'BTC': myWallet.getBTCAmount(), 'Total Net Worth After Tax': myWallet.getNetWorth(btcGoldDF['BTC Price'][startDay+index], btcGoldDF['Gold Price'][startDay+index])}
                         break
 
         if (not changes):
             startDay += 1
 
     print(myWallet.wallet)
+    spikeTraderDF.to_csv('./Data/SpikeTrader.csv')
 
 def getRiseFall(previousPrice, currentPrice):
     if previousPrice > currentPrice:
