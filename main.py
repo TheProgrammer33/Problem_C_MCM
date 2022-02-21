@@ -141,6 +141,11 @@ def predictFuture():
             actualPrice = btcGoldDF.iloc[len(btcGoldDF)-1][product + " Price"]
             print("Selling " + str(myWallet.wallet[product]) + " " + product)
             myWallet.sell(product, actualPrice)
+            spikeTrader['Date'].append('9/10/21')
+            spikeTrader['USD'].append(myWallet.getAvailableMoney())
+            spikeTrader['Gold'].append(myWallet.getGoldAmount())
+            spikeTrader['BTC'].append(myWallet.getBTCAmount())
+            spikeTrader['Total Net Worth'].append(myWallet.getNetWorth(0, 0))
 
     print(myWallet.wallet)
     
