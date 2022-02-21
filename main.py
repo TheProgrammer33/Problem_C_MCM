@@ -188,7 +188,6 @@ def predictFuture():
                     pass
 
                 if spike:
-                    startDay = index
                     # TODO - buy or sell
                     availableMoney = myWallet.getAvailableMoney()
                     price = round(predictionDF.iloc[index]["Price"], 2)
@@ -200,6 +199,7 @@ def predictFuture():
                             if numberOfProducts <= 0:
                                 continue
                             myWallet.sell(product, price, numberOfProducts)
+                            startDay += index
                             break
                     if (fall):
                         numberOfProducts = (math.floor(availableMoney / price))
@@ -208,6 +208,7 @@ def predictFuture():
                         if numberOfProducts <= 0:
                             continue
                         myWallet.buy(product, price, numberOfProducts)
+                        startDay += index
                         break
 
     print(myWallet)
