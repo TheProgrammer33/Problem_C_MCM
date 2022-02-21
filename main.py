@@ -48,9 +48,15 @@ def main():
 
 def predictFuture():
     # TODO - find best starting day
-    spikeTraderDF = pd.DataFrame(columns=['Date', 'USD', 'Gold', 'BTC', 'Total Net Worth'])
+    spikeTrader = {'Date': [], 'USD': [], 'Gold': [], 'BTC': [], 'Total Net Worth': []}
+    spikeTrader['Date'].append('9/11/16')
+    spikeTrader['USD'].append(1000)
+    spikeTrader['Gold'].append(0)
+    spikeTrader['BTC'].append(0)
+    spikeTrader['Total Net Worth'].append(1000)
     myWallet = wallet.Wallet()
     startDay = 10
+
     while startDay < len(btcGoldDF):
         changes = False
         for product in ["BTC", "Gold"]:
@@ -102,7 +108,11 @@ def predictFuture():
                             myWallet.sell(product, actualPrice)
                             startDay += index+1
                             changes = True
-                            spikeTraderDF.iloc[-1] = {'Date': btcGoldDF['Date'][startDay + index], 'USD': myWallet.getAvailableMoney(), 'Gold': myWallet.getGoldAmount(), 'BTC': myWallet.getBTCAmount(), 'Total Net Worth After Tax': myWallet.getNetWorth(btcGoldDF['BTC Price'][startDay+index], btcGoldDF['Gold Price'][startDay+index])}
+                            spikeTrader['Date'].append(btcGoldDF['Date'][startDay])
+                            spikeTrader['USD'].append(myWallet.getAvailableMoney())
+                            spikeTrader['Gold'].append(myWallet.getGoldAmount())
+                            spikeTrader['BTC'].append(myWallet.getBTCAmount())
+                            spikeTrader['Total Net Worth'].append(myWallet.getNetWorth(btcGoldDF['BTC Price'][startDay], btcGoldDF['Gold Price'][startDay]))
                             break
                     if (fall):
                         actualPrice = btcGoldDF.iloc[startDay + index][product + " Price"]
@@ -116,13 +126,19 @@ def predictFuture():
                         myWallet.buy(product, actualPrice, numberOfProducts)
                         startDay += index+1
                         changes = True
-                        spikeTraderDF.iloc[-1] = {'Date': btcGoldDF['Date'][startDay + index], 'USD': myWallet.getAvailableMoney(), 'Gold': myWallet.getGoldAmount(), 'BTC': myWallet.getBTCAmount(), 'Total Net Worth After Tax': myWallet.getNetWorth(btcGoldDF['BTC Price'][startDay+index], btcGoldDF['Gold Price'][startDay+index])}
+                        spikeTrader['Date'].append(btcGoldDF['Date'][startDay])
+                        spikeTrader['USD'].append(myWallet.getAvailableMoney())
+                        spikeTrader['Gold'].append(myWallet.getGoldAmount())
+                        spikeTrader['BTC'].append(myWallet.getBTCAmount())
+                        spikeTrader['Total Net Worth'].append(myWallet.getNetWorth(btcGoldDF['BTC Price'][startDay], btcGoldDF['Gold Price'][startDay]))
                         break
 
         if (not changes):
             startDay += 1
 
     print(myWallet.wallet)
+    
+    spikeTraderDF = pd.DataFrame(spikeTrader)
     spikeTraderDF.to_csv('./Data/SpikeTrader.csv')
 
 def getRiseFall(previousPrice, currentPrice):
