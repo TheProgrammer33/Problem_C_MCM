@@ -5,7 +5,6 @@ from multiprocessing import Process
 import dataAnalyzer, dataCleaner
 import regressionModels
 import classificationModels
-import priceEffect
 import wallet
 
 import matplotlib.pyplot as plt
@@ -91,24 +90,20 @@ def predictFuture():
                 if spike:
                     # TODO - buy or sell
                     availableMoney = myWallet.getAvailableMoney()
-                    price = round(predictionDF.iloc[index]["Price"], 2)
                     if (rise):
-                        if (myWallet.wallet[product]):
-                            numberOfProducts = (math.floor(myWallet.wallet[product] / price))
-                            if price*numberOfProducts > myWallet.wallet[product]:
-                                numberOfProducts -= 1
-                            if numberOfProducts <= 0:
-                                continue
-                            myWallet.sell(product, price, numberOfProducts)
+                        if (myWallet.wallet[product] > 0):
+                            actualPrice = btcGoldDF.iloc[startDay + index][product + " Price"]
+                            myWallet.sell(product, actualPrice, numberOfProducts)
                             startDay += index
                             break
                     if (fall):
-                        numberOfProducts = (math.floor(availableMoney / price))
-                        if price*numberOfProducts > availableMoney:
+                        actualPrice = btcGoldDF.iloc[startDay + index][product + " Price"]
+                        numberOfProducts = (math.floor(availableMoney / actualPrice))
+                        if actualPrice*numberOfProducts > availableMoney:
                             numberOfProducts -= 1
                         if numberOfProducts <= 0:
                             continue
-                        myWallet.buy(product, price, numberOfProducts)
+                        myWallet.buy(product, actualPrice, numberOfProducts)
                         startDay += index
                         break
 
