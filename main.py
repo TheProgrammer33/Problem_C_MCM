@@ -147,8 +147,9 @@ def getStartingDayAccuracy():
             prediction = regressionModels.DecisionTree(trainingDays)
 
 def predictFuture():
-    myWallet = wallet.Wallet()
-    for startDay in range(10, len(btcGoldDF)-1):
+    # TODO - find best starting day
+    for startDay in range(20, 100):
+        myWallet = wallet.Wallet()
         for product in ["BTC", "Gold"]:
             regressionModels.PREDICTION = product + ' Price'
             regressionModels.DATA = [product + 'DaysSinceRise', product + 'DaysSinceFall']
@@ -211,7 +212,7 @@ def predictFuture():
                         startDay += index
                         break
 
-    print(myWallet)
+        print(myWallet.wallet)
 
 
 def getRiseFall(previousPrice, currentPrice):
