@@ -37,7 +37,7 @@ def predictFuture():
             predictionDF = pd.DataFrame(columns=['Price', 'Rise', 'Fall'])
 
             regressionModels.setRiseFallDays(startDay)
-            model = regressionModels.DecisionTree(startDay)
+            model = regressionModels.gradientBoosting(startDay)
             for trainingDays in range(startDay+1, len(btcGoldDF)-1):
                 predictionDict = {'Price': [], 'Rise': [], 'Fall': []}
                 spike = False
