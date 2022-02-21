@@ -114,6 +114,9 @@ def predictFuture():
                         changes = True
                         break
 
+        if (not changes):
+            startDay += 1
+
     print(myWallet.wallet)
 
 def getRiseFall(previousPrice, currentPrice):
