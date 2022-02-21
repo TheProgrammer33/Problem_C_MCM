@@ -48,8 +48,12 @@ def main():
 def predictFuture():
     # TODO - find best starting day
     myWallet = wallet.Wallet()
-    for startDay in range(10, len(btcGoldDF)-1):
+    startDay = 10
+    while startDay < len(btcGoldDF):
+        changes = False
         for product in ["BTC", "Gold"]:
+            if (changes):
+                break
             regressionModels.PREDICTION = product + ' Price'
             regressionModels.DATA = [product + 'DaysSinceRise', product + 'DaysSinceFall']
             predictionDF = pd.DataFrame(columns=['Price', 'Rise', 'Fall'])
@@ -94,7 +98,8 @@ def predictFuture():
                             actualPrice = btcGoldDF.iloc[startDay + index][product + " Price"]
                             print("Selling " + str(myWallet.wallet[product]) + " " + product)
                             myWallet.sell(product, actualPrice)
-                            startDay += index
+                            startDay += index+1
+                            changes = True
                             break
                     if (fall):
                         actualPrice = btcGoldDF.iloc[startDay + index][product + " Price"]
@@ -105,7 +110,8 @@ def predictFuture():
                             continue
                         print("Buying " + str(numberOfProducts) + " " + product)
                         myWallet.buy(product, actualPrice, numberOfProducts)
-                        startDay += index
+                        startDay += index+1
+                        changes = True
                         break
 
     print(myWallet.wallet)
