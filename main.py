@@ -104,7 +104,8 @@ def predictFuture():
                     if (fall):
                         actualPrice = btcGoldDF.iloc[startDay + index][product + " Price"]
                         numberOfProducts = (math.floor(availableMoney / actualPrice))
-                        if actualPrice*numberOfProducts > availableMoney:
+                        newPrice = (actualPrice*numberOfProducts)
+                        if newPrice+(newPrice*myWallet.fees[product]) > availableMoney:
                             numberOfProducts -= 1
                         if numberOfProducts <= 0:
                             continue
