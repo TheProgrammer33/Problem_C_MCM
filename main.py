@@ -138,7 +138,7 @@ def predictFuture():
 
     for product in ["BTC", "Gold"]:
         if (myWallet.wallet[product] > 0):
-            actualPrice = btcGoldDF.iloc[startDay + index][product + " Price"]
+            actualPrice = btcGoldDF.iloc[len(btcGoldDF)-1][product + " Price"]
             print("Selling " + str(myWallet.wallet[product]) + " " + product)
             myWallet.sell(product, actualPrice)
 
