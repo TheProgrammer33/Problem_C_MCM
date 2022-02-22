@@ -19,12 +19,16 @@ class Wallet:
         return (totalBTCMoney - (totalBTCMoney * self.fees["BTC"])) + (totalGoldMoney - (totalGoldMoney * self.fees["Gold"])) + self.wallet["USD"]
 
     def buy(self, product, price, numberOfProducts):
+        # Spend money to buy product and add product to wallet
         self.wallet["USD"] -= round(price * numberOfProducts, 2)
         self.wallet[product] += numberOfProducts
+        # Take away the fee
         self.wallet["USD"] -= round(price * numberOfProducts * self.fees[product], 2)
 
     def sell(self, product, price):
         numberOfProducts = self.wallet[product]
+        # Receive money for selling product and remove product from wallet
         self.wallet["USD"] += round(price * numberOfProducts, 2)
         self.wallet[product] -= numberOfProducts
+        # Take away the fee
         self.wallet["USD"] -= round(price * numberOfProducts * self.fees[product], 2)
