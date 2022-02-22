@@ -99,15 +99,16 @@ def MLPNN(numDataPoints):
     return targetPrediction
 
 def gradientBoosting(numDataPoints):
-    train, test, data, target = setupData(numDataPoints, True)
+    # train, test, data, target = setupData(numDataPoints, True)
+    train, test, data, target = setupDataRiseFall(numDataPoints)
 
-    gradientBoosting_model = GradientBoostingRegressor(n_estimators=750, learning_rate=1)
+    gradientBoosting_model = GradientBoostingRegressor(n_estimators=500, learning_rate=1)
 
     gradientBoosting_model.fit(train[data], train[target])
 
-    targetPrediction = gradientBoosting_model.predict(test[data])
+    # targetPrediction = gradientBoosting_model.predict(test[data])
 
-    return targetPrediction
+    return gradientBoosting_model
 
 def XGBoost(numDataPoints):
     train, test, data, target = setupData(numDataPoints, True)
