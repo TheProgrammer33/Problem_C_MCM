@@ -158,7 +158,7 @@ def findNextBottomOfSpike(prediction, startDayPrice, fee):
         if p < lowestValue:
             lowestValue = p
             lowIndex = index
-        elif (p > lowestValue and highestValue - p  > (p * fee)):
+        elif (p > lowestValue and highestValue - p  > (p * fee*2)):
             return lowestValue, lowIndex
         
         if (p > highestValue):
@@ -173,7 +173,7 @@ def findNextTopOfSpike(prediction, startDayPrice, fee):
         if (p > highestValue):
             highestValue = p
             highIndex = index
-        elif (p < highestValue and p - lowestValue > (p * fee)):
+        elif (p < highestValue and p - lowestValue > (p * fee*2)):
             return highestValue, highIndex
         
         if p < lowestValue:
