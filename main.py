@@ -30,6 +30,7 @@ def predictFuture():
     while startDay < len(btcGoldDF):
         changes = False
         for product in ["BTC", "Gold"]:
+            # Add ability to pick best product to buy
             if (changes):
                 break
             regressionModels.PREDICTION = product + ' Price'
@@ -86,10 +87,7 @@ def predictFuture():
                             break
                     if (fall):
                         actualPrice = btcGoldDF.iloc[startDay + index][product + " Price"]
-                        numberOfProducts = (math.floor(availableMoney / actualPrice))
-                        newPrice = (actualPrice*numberOfProducts)
-                        if newPrice+(newPrice*myWallet.fees[product]) > availableMoney:
-                            numberOfProducts -= 1
+                        numberOfProducts = math.trunc((availableMoney / (actualPrice + actualPrice*myWallet.fees[product]))*1000)/1000
                         if numberOfProducts <= 0:
                             continue
                         print("Buying " + str(numberOfProducts) + " " + product)
